@@ -1,0 +1,28 @@
+# Node.js
+node_modules/
+
+# Archivos de configuración locales
+.env
+
+# Archivos de registro y archivos temporales
+logs/
+*.log
+npm-debug.log*
+
+# Dependiendo de tu editor y sistema, podrías necesitar ignorar más cosas:
+
+# Visual Studio Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Entornos de desarrollo específicos
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Otros archivos generados automáticamente
+package-lock.json
+yarn.lock

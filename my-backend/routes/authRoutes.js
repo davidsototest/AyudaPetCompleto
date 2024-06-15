@@ -1,0 +1,1 @@
+// Contiene rutas relacionadas con la autenticación, como login, registro, y logout.

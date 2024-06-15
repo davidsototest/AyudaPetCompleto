@@ -1,0 +1,1 @@
+// Contiene rutas para gestionar las publicaciones
