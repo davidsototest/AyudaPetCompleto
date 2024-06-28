@@ -9,7 +9,7 @@ const getAllPublications = (req, res) => {
 }
 const getPublicationById = (req, res) => {
     const { id } = req.params;
-    const sql = 'select pub.id, pub.user_id, pub.pet_id, pub.status, pub.date, pub.description, com.comment from publications pub left join comments com on pub.id = com.publication_id where pub.id = ?';
+    const sql = 'select pub.id, pub.user_id, pub.pet_id, pub.status, pub.date, pub.description, com.id as id_com, com.status as status_com, com.comment,  com.date as date_com, com.user_id as user_id_com from publications pub left join comments com on pub.id = com.publication_id where pub.id = ?';
     db.query(sql, [id], (err, results) => {
         if(results == '') return res.status(404).send({ message: 'No existe recursos para la solicitud.'});
         const result = {
@@ -23,7 +23,7 @@ const getPublicationById = (req, res) => {
         }
         if(!results[0].comment) return res.json(result);
         for (let index = 0; index < results.length; index++) {
-            result.comments.push(results[index].comment);            
+            result.comments.push({id : results[index].id_com, comment : results[index].comment, date : results[index].date_com, user_id : results[index].user_id_com, status : results[index].status_com});            
         }
         res.json(result);
     });
