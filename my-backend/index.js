@@ -5,6 +5,8 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const db = require('./confi/dbConfi');
 
+const publicationsRoutes = require('./routes/publicationsRoutes');
+
 const app = express();
 const port = process.env.PORT || 3001; //process.env.PORT es para que al subirlo al serve en la nube tome el puesto que este entorno le asigne y no el 3001.
 
@@ -17,6 +19,8 @@ const corsOptions = {
 
 // Middleware para manejar CORS
 app.use(cors(corsOptions));
+
+app.use('/publications', publicationsRoutes);
 
 app.get('/', (req, res) => {
     res.send('GET equipo 12');
