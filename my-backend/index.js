@@ -3,10 +3,12 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
-const db = require('./confi/dbConfi');
+const db = require('./config/dbConfig');
 
 const app = express();
 const port = process.env.PORT || 3001; //process.env.PORT es para que al subirlo al serve en la nube tome el puesto que este entorno le asigne y no el 3001.
+const publicationsRoutes = require('../my-backend/routes/publicationsRoutes');
+const userRoutes = require('../my-backend/routes/userRoutes')
 
 // Configuración de CORS
 const corsOptions = {
@@ -34,6 +36,10 @@ app.delete('/', (req, res) => {
     res.send('DELETE equipo 12');
 });
 
+app.use('/user', userRoutes);
+app.use('/publications', publicationsRoutes);
+
+
 app.listen(port, () => {
-  console.log(`Servidor backend corriendo en:  http://localhost:${port}`);
+  console.log(`Servidor backend corriendo en:  httpnlocalhost:${port}`);
 });

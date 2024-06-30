@@ -1,4 +1,4 @@
-//toda esta data es de ejemplo para guiarnos
+// userModel.js
 
 const db = require('../config/dbConfig');
 
