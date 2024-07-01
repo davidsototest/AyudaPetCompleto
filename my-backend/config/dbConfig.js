@@ -21,3 +21,8 @@ db.connect(err => {
 });
 
 module.exports = db;
+
+// module.exports = {
+//     secretKey : process.env.secretKey,
+//     tokenExpiresIn : '1h'
+// }

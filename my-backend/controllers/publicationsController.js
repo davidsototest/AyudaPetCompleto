@@ -1,4 +1,5 @@
 const db = require('../config/dbConfig');
+const publicationMiddleware = require('../middleware/loggerMiddleware')
 
 //--------------------TRAER TODAS LAS PUBLICACIONES-----------------------
 const getAllPublications = (req, res) => {
@@ -137,12 +138,67 @@ const updateComment = (req, res) => {
         });
     });
 };
+//--------------------DELETE PUBLICACION--------------------------
+const deletePublication = (req, res) =>{
+    const { id } = req.params;
+    
+    // Validar que la publicación existe
+    const sql = 'SELECT * FROM publications WHERE id = ?';
+    db.query(sql, [id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error en la base de datos', error: err.message });
+        }
+        if(result.length === 0 || result[0].status == 0) return res.status(404).send({ "message": "La publicación no existe." });
 
+        // "Eliminar" la publicacion
+        const sqlUpdate = 'UPDATE publications SET status = 0 WHERE id = ?;';
+        db.query(sqlUpdate, [id], (err, result) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error al eliminar el comentario', error: err.message });
+            }
+            res.status(204).send('Publicación eliminada exitosamente.') ;           
+        });        
+    });
+}
+//-------------------DELETE COMMENT--------------------------------------------------------------
+const deleteComment = (req, res) => {
+    const { publicationId, id } = req.params;
 
+    //Validar Existencia de la publicación
+    const sqlPub = 'SELECT * FROM publications WHERE id = ?';
+    db.query(sqlPub, [publicationId], (err, result) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error en la base de datos', error: err.message });
+        }
+        if(result.length === 0 || result[0].status == 0) return res.status(404).send({ "message": "Publicación no encontrada." });
+
+        //Validar la existencia del comentario
+        const sqlCom = 'SELECT * FROM comments WHERE id = ?';
+        db.query(sqlCom, [id], (err, result) => {
+
+            if (err) {
+                return res.status(500).json({ message: 'Error en la base de datos', error: err.message });
+            }
+            if(result.length === 0 || result[0].status == 0) return res.status(404).send({ "message": "Comentario no encontrado." });
+            
+            //"Eliminar" el comentario
+            const sqlUpdate = 'UPDATE comments SET status = 0 WHERE id = ?;';
+            db.query(sqlUpdate, [id], (err, result) => {
+                if (err) {
+                    return res.status(500).json({ message: 'Error al eliminar el comentario', error: err.message });
+                }
+                res.status(204).send('Publicación eliminada exitosamente.') ;           
+            }); 
+        });       
+    });
+}
+//-------------------EXPORTS--------------------------------------  
 module.exports = {
     getAllPublications,
     getPublicationById,
     createPublication,
     updatePublication,
-    updateComment
+    updateComment,
+    deletePublication,
+    deleteComment
 };

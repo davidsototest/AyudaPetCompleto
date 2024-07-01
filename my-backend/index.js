@@ -8,7 +8,7 @@ const db = require('./config/dbConfig');
 const app = express();
 const port = process.env.PORT || 3001; //process.env.PORT es para que al subirlo al serve en la nube tome el puesto que este entorno le asigne y no el 3001.
 const publicationsRoutes = require('./routes/publicationsRoutes');
-const userRoutes = require('./routes/userRoutes')
+const userRoutes = require('./routes/userRoutes');
 
 // Configuración de CORS
 const corsOptions = {
@@ -19,6 +19,7 @@ const corsOptions = {
 
 // Middleware para manejar CORS
 app.use(cors(corsOptions));
+app.use(express.json())
 
 app.get('/', (req, res) => {
     res.send('GET equipo 12');
