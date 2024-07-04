@@ -2,7 +2,15 @@
 const db = require('../config/dbConfig');
 
 
-
+//Obtengo los usuarios
+const getAllUsers = (callback) => {
+    db.query('SELECT id, name, ubication, phone, email, status, imgUrl FROM User', (err, results) => {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, results);
+    });
+};
 
 //Obtengo el usuario por el email
 const getUser = (userEmail, callback) => {
@@ -25,6 +33,7 @@ const create = (newUser, callback) => {
 };
 
 module.exports = {
+    getAllUsers,
     create,
     getUser
 }

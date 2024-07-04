@@ -13,7 +13,18 @@ const hashedPassword = (Password) => {
     const saltRounds = 10;
     return bcrypt.hashSync(Password, saltRounds);
 };
-
+//--------------------------OBTENER TODOS LOS USUARIOS---------------------------
+const getUsers = (req, res) => {
+    userModel.getAllUsers((err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else if (results.length === 0) {
+            res.status(404).json({ message: 'Usuario no encontrado' });
+        } else {
+            res.status(404).json(results);   
+        }       
+    });   
+}
 //-------------------------  CREAR UN NUEVO USUARIO ------------------------------
 const createUser = (req, res) => {
     const { Name, Ubication, Password, Phone, Email, status, imgUrl} = req.body;
@@ -162,6 +173,7 @@ const deleteUser = (req, res) =>{
 }
 //-------------------------------------------------------------------------------------------------------
  module.exports = {
+    getUsers,
     createUser,
     updateUser, 
     //register,
