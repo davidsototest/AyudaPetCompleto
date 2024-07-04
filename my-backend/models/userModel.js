@@ -2,11 +2,19 @@
 const db = require('../config/dbConfig');
 
 
-
+//Obtengo los usuarios
+const getAllUsers = (callback) => {
+    db.query('SELECT id, name, ubication, phone, email, status, imgUrl FROM User', (err, results) => {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, results);
+    });
+};
 
 //Obtengo el usuario por el email
 const getUser = (userEmail, callback) => {
-    db.query('SELECT * FROM user WHERE email = ?', [userEmail], (err, results) => {
+    db.query('SELECT * FROM User WHERE email = ?', [userEmail], (err, results) => {
         if (err) {
             return callback(err);
         }
@@ -16,7 +24,7 @@ const getUser = (userEmail, callback) => {
 
 // // Crear un nuevo usuario
 const create = (newUser, callback) => {
-    db.query('INSERT INTO user SET ?', newUser, (err, result) => {
+    db.query('INSERT INTO User SET ?', newUser, (err, result) => {
         if (err) {
             return callback(err);
         }
@@ -26,7 +34,8 @@ const create = (newUser, callback) => {
 
 module.exports = {
     create,
-    getUser
+    getUser,
+    getAllUsers
 }
 // // Obtener todos los usuarios
 // exports.getAll = (callback) => {

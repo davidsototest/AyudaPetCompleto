@@ -1,35 +1,100 @@
 const db = require('../config/dbConfig');
 const publicationMiddleware = require('../middleware/loggerMiddleware')
+const publicationModel = require('../models/publicationModel')
 
 //--------------------TRAER TODAS LAS PUBLICACIONES-----------------------
 const getAllPublications = (req, res) => {
-    const sql = 'SELECT id, user_id, pet_id, status, date FROM publications WHERE status != 0';
+    const sql = `SELECT pub.id, pub.status, pub.date,
+                    User.name, User.ubication, User.phone, User.email, User.status as status_user, User.imgUrl as imgUrl_user,
+                    Pet.name as name_pet, Pet.raze, pet.age, Pet.color, pet.size, Pet.imgUrl as imgUrl_pet from Publications pub 
+                JOIN User ON pub.user_id = User.id 
+                JOIN Pet ON pub.pet_id = Pet.id
+                WHERE pub.status != 0`
     db.query(sql, (err, results) => {
         if(results == '') return res.status(204).send({ message: 'No existe datos para la solicitud.'});
-        res.json(results);
+        const publications = []
+        for (let i = 0; i < results.length; i++) {
+            publications.push(
+                {
+                    id : results[i].id,
+                    status : results[i].status,
+                    date : results[i].date,
+                    user : {
+                        name : results[i].name,
+                        ubication : results[i].ubication,
+                        phone : results[i].phone,
+                        email : results[i].email,
+                        status : results[i].status,
+                        imgUrl : results[i].imgUrl_user
+                        },
+                    pet : {
+                        name : results[i].name_pet,
+                        raze : results[i].raze,
+                        age : results[i].age,
+                        color : results[i].color,
+                        size : results[i].size,
+                        imgUrl : results[i].imgUrl_pet,
+                    }
+                }
+            ) 
+            
+        }
+        res.json(publications);
     })
 }
 //---------------------TRAER PUBLICACIONES POR ID---------------------------
 const getPublicationById = (req, res) => {
     const { id } = req.params;
-    const sql = 'select pub.id, pub.user_id, pub.pet_id, pub.status, pub.date, pub.description, com.id as id_com, com.status as status_com, com.comment,  com.date as date_com, com.user_id as user_id_com from publications pub left join comments com on pub.id = com.publication_id where pub.id = ?';
-    db.query(sql, [id], (err, results) => {
-        if(results == '') return res.status(404).send({ message: 'No existe recursos para la solicitud.'});
-        const result = {
-            id : results[0].id,
-            user_id : results[0].user_id,
-            pet_id : results[0].pet_id,
-            status : results[0].status,
-            date : results[0].date,
-            description : results[0].description,
-            comments : []
-        }
-        if(!results[0].comment) return res.json(result);
-        for (let index = 0; index < results.length; index++) {
-            result.comments.push({id : results[index].id_com, comment : results[index].comment, date : results[index].date_com, user_id : results[index].user_id_com, status : results[index].status_com});            
-        }
-        res.json(result);
-    });
+    publicationModel.getPublicationById(id,(err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else if (results.length === 0) {
+            res.status(404).json({ message: 'Usuario no encontrado' });
+        } else {
+            const result = {
+                id : results[0].id,
+                status : results[0].status,
+                date : results[0].date,            
+                pet : {
+                    name : results[0].name_pet, 
+                    raze : results[0].raze,
+                    age : results[0].age,
+                    size : results[0].size,
+                    color : results[0].color,
+                    description : results[0].description,
+                    imgUrl : results[0].imgUrl_pet,
+                },
+                user : {
+                    name : results[0].name,
+                    ubication : results[0].ubication,
+                    phone : results[0].phone,
+                    email : results[0].email,
+                    status : results[0].status_user,
+                    imgUrl : results[0].imgUrl_user,
+                },
+                comments : []
+            }
+            if(!results[0].comment) return res.json(result);
+            for (let i = 0; i < results.length; i++) {          
+                const comment ={
+                    id : results[i].id_com,
+                    comment : results[i].comment, 
+                    date : results[i].date_com, 
+                    status : results[i].status_com,
+                    user_name : results[i].user_com.name,
+                    user_ubication : results[i].user_com.ubication,
+                    user_phone : results[i].user_com.phone,
+                    user_email : results[i].user_com.email,
+                    user_status : results[i].user_com.status,
+                    user_imgUrl : results[i].user_com.imgUrl,
+                    }
+
+                result.comments.push(comment);                  
+                    
+                }            
+                res.json(result);                                
+            }                    
+    })
 }
 //-------------------------------- CREAR PUBLICACION-----------------------------------------------
 const createPublication = (req, res) => {
