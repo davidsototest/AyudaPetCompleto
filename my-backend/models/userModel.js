@@ -33,6 +33,7 @@ const create = (newUser, callback) => {
 };
 
 module.exports = {
+    getAllUsers,
     create,
     getUser,
     getAllUsers
