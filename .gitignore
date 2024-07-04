@@ -26,3 +26,5 @@ npm-debug.log*
 # Otros archivos generados automáticamente
 package-lock.json
 yarn.lock
+
+.env
