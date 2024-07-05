@@ -1,0 +1,16 @@
+import 'animate.css';
+
+className="animate__animated animate__pulse"
+
+className="animate__animated animate__backInDown"
+
+
+animate__fadeIn
+animate__fadeOut
+
+className="animate__animated animate__fadeIn"    animate__delay-2s
+
+className="animate__animated animate__fadeOut"
+
+animate__bounceIn
+className="animate__animated animate__bounceIn"
