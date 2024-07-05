@@ -31,14 +31,12 @@ const createUser = (req, res) => {
     // valido los campos
     if(!name || !password || !email || !ubication || !phone){
         return res.status(400).json({ message: 'Faltan datos requeridos'})
-    }
+    };
 
     //Valido  que sea un mail 
     if(!isValidEmail(email)) {
         return res.status(400).json({ message: 'Email invalido'})
-    }
-
-    console.log("mail valido")
+    };
 
     // if(Phone && Phone.length < 10) {
     //     return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
