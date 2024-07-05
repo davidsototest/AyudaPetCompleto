@@ -6,7 +6,7 @@ const publicationModel = require("../models/publicationModel");
 const getAllPublications = (req, res) => {
   const sql = `SELECT pub.id, pub.status, pub.date,
                     User.name, User.ubication, User.phone, User.email, User.status as status_user, User.imgUrl as imgUrl_user,
-                    Pet.name as name_pet, Pet.raze, pet.age, Pet.color, pet.size, Pet.imgUrl as imgUrl_pet from Publications pub 
+                    Pet.name as name_pet, Pet.raze, Pet.age, Pet.color, Pet.size, Pet.imgUrl as imgUrl_pet from Publications pub 
                 JOIN User ON pub.user_id = User.id 
                 JOIN Pet ON pub.pet_id = Pet.id
                 WHERE pub.status != 0`;
@@ -49,7 +49,7 @@ const getPublicationById = (req, res) => {
     if (err) {
       res.status(500).json({ error: err.message });
     } else if (results.length === 0) {
-      res.status(404).json({ message: "Usuario no encontrado" });
+      res.status(404).json({ message: "Publicación no encontrada" });
     } else {
       const result = {
         id: results[0].id,

@@ -4,11 +4,11 @@ const userModel = require('./userModel')
 const getPublicationById= (publicationId, callback) => {
     db.query(`SELECT pub.id, pub.status, pub.date, pub.description,
 	                User.name, User.ubication, User.phone, User.email, User.status as status_user, User.imgUrl as imgUrl_user,
-	                Pet.name as name_pet, Pet.raze, pet.age, Pet.color, Pet.size, Pet.imgUrl as imgUrl_pet, 
+	                Pet.name as name_pet, Pet.raze, Pet.age, Pet.color, Pet.size, Pet.imgUrl as imgUrl_pet, 
 	                com.id as id_com, com.status as status_com, com.comment,  com.date as date_com, com.user_id as user_id_com
                 FROM Publications pub
-                JOIN User ON pub.user_id = user.id 
-                JOIN Pet ON pub.pet_id = pet.id
+                JOIN User ON pub.user_id = User.id 
+                JOIN Pet ON pub.pet_id = Pet.id
                 LEFT JOIN Comments com on pub.id = com.publication_id
                 WHERE pub.id = ?`, [publicationId], (err, results) => {
         if (err) {

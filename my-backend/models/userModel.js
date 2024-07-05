@@ -1,6 +1,15 @@
 // userModel.js
 const db = require('../config/dbConfig');
 
+//Obtengo los usuarios
+const getAllUsers = (callback) => {
+    db.query('SELECT id, name, ubication, phone, email, status, imgUrl FROM User', (err, results) => {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, results);
+    });
+};
 
 //Obtengo la cantidad de usuarios en la tabla User
 const getUserCount = (callback) => {
@@ -49,7 +58,8 @@ module.exports = {
     create,
     getUser,
     getUserCount,
-    getUserExistsDB
+    getUserExistsDB,
+    getAllUsers
 }
 // // Obtener todos los usuarios
 // exports.getAll = (callback) => {
