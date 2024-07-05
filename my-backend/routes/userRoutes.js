@@ -6,7 +6,7 @@ const userMiddleware = require('../middleware/loggerMiddleware')
 
 router.post('/', userController.createUser);
 router.put('/:id', userController.updateUser);
-
+router.get('/', userController.getUsers);
 //router.post('/register', userController.register)
 router.post('/login', userController.login)
 router.delete('/:id', userMiddleware, (req, res, next) => {

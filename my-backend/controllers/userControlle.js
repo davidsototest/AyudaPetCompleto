@@ -4,6 +4,27 @@ const db = require ('../config/dbConfig');
 const config = require('../config/config');
 const userModel = require('../models/userModel');
 
+const isValidEmail = (email) => {
+    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()\[\]\\.,;:\s@"]+\.)+[^<>()\[\]\\.,;:\s@"]{2,})$/i;
+    return re.test(String(email).toLowerCase());
+};
+
+const hashedPassword = (Password) => {
+    const saltRounds = 10;
+    return bcrypt.hashSync(Password, saltRounds);
+};
+//--------------------------OBTENER TODOS LOS USUARIOS---------------------------
+const getUsers = (req, res) => {
+    userModel.getAllUsers((err, results) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else if (results.length === 0) {
+            res.status(404).json({ message: 'Usuario no encontrado' });
+        } else {
+            res.status(404).json(results);   
+        }       
+    });   
+}
 //-------------------------  CREAR UN NUEVO USUARIO ------------------------------
 const createUser = async (req, res) => {
     const { name, ubication, password, phone, email, status, imgUrl } = req.body;
@@ -168,6 +189,7 @@ const deleteUser = (req, res) =>{
 }
 //-------------------------------------------------------------------------------------------------------
  module.exports = {
+    getUsers,
     createUser,
     updateUser, 
     //register,
