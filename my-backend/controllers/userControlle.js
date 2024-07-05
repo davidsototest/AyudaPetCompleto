@@ -9,7 +9,7 @@ const isValidEmail = (email) => {
     return re.test(String(email).toLowerCase());
 };
 
-const hashedPassword = (Password) => {
+const hashedPasswordUser = (Password) => {
     const saltRounds = 10;
     return bcrypt.hashSync(Password, saltRounds);
 };
@@ -26,7 +26,7 @@ const getUsers = (req, res) => {
     });   
 }
 //-------------------------  CREAR UN NUEVO USUARIO ------------------------------
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
     const { name, ubication, password, phone, email, imgUrl} = req.body;
     // valido los campos
     if(!name || !password || !email || !ubication || !phone){
@@ -38,24 +38,37 @@ const createUser = (req, res) => {
         return res.status(400).json({ message: 'Email invalido'})
     };
 
-    // if(Phone && Phone.length < 10) {
-    //     return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
-    // }
+    //validar si el email ya esta registrado en la base de datos
+    try {
+        const userExist = await userModel.getUserExistsDB(email);
+        if(userExist){
+            return res.status(400).json({ message: 'El email ya esta siendo usado'})
+        };
+    } catch (error) {
+        res.status(500).json({ error: 'Error al verificar el email en DDBB ...' });
+    };
 
-    // const hashedPassword = hashedPassword(Password);
+    //validar que el numero tenga 10 o mas digitos
+    if(phone.length < 10) {
+        return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
+    };
 
-    // //Insertar usuario en la base de datos!
-    // const sqlInsertUser = 'INSERT INTO user (Name, Ubication, Password, Phone, Email, status, imgUrl) VALUES (?,?,?,?,?,?,?)';
-    // db.query(sqlInsertUser, [Name, Ubication, hashedPassword, Phone, Email, status, imgUrl], (err, result) => {
-    //     if(err) {
-    //         if(err.code === 'ER_DUP_ENTRY') {
-    //             return res.status(400).json({message:'El usuario con el Email ya existe!'});
-    //        }
-    //        return res.status(500).json({message: 'Error al crear el usuario'})
-    //     }
-    //     res.status(201).json({message: 'Usuario creado exitosamente!'});
-    // });
-}
+    //hashar contrasenia
+    const hashedPassword = hashedPasswordUser(password);
+
+    //ahora que todo esta bien, envio todos los datos a la DDBB
+    //Insertar usuario en la base de datos!
+    const sqlInsertUser = 'INSERT INTO User (name, ubication, password, phone, email, status, imgUrl) VALUES (?,?,?,?,?,?,?)';
+    db.query(sqlInsertUser, [name, ubication, hashedPassword, phone, email, 1, imgUrl], (err, result) => {
+        if (err) {
+            // Manejo del error
+            console.error('Error al crear el usuario:', err); // Registro detallado del error
+            return res.status(500).json({ message: 'Error al crear el usuario' });
+        }
+        // Si no hay error, enviar la respuesta de éxito
+        res.status(201).json({ message: 'Usuario creado exitosamente!' });
+    });
+};
 
 // --------------------------------- MODIFICAR USUARIO POR ID ------------------------------------------
 const updateUser = (req,res) => {

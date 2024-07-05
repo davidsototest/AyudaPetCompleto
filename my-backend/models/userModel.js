@@ -22,6 +22,19 @@ const getUser = (userEmail, callback) => {
     });
 };
 
+//validar si el user EXISTE para permitir crear nuevo usuario
+const getUserExistsDB = (email) => {
+    return new Promise((resolve, reject) => {
+        db.query('SELECT * FROM User WHERE email = ?', [email], (err, results) => {
+            if (err) {
+                return reject(err);
+            }
+            // Resuelve en true si el usuario existe, false si no existe
+            resolve(results.length > 0);
+        });
+    });
+};
+
 // // Crear un nuevo usuario
 const create = (newUser, callback) => {
     db.query('INSERT INTO User SET ?', newUser, (err, result) => {
@@ -36,7 +49,8 @@ module.exports = {
     getAllUsers,
     create,
     getUser,
-    getAllUsers
+    getAllUsers,
+    getUserExistsDB
 }
 // // Obtener todos los usuarios
 // exports.getAll = (callback) => {
