@@ -11,7 +11,7 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import { Comment, comments } from '../data/commentsTest';
 import 'animate.css';
-import Toastify from "toastify-js";
+// import toastify from 'toastify-js'
 import { ToastiSuccess } from "../toasti/ToastiSuccess";
 import { ToastiError } from "../toasti/ToastiError";
 
