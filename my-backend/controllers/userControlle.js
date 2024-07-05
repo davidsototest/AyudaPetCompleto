@@ -65,8 +65,16 @@ const createUser = async (req, res) => {
             console.error('Error al crear el usuario:', err); // Registro detallado del error
             return res.status(500).json({ message: 'Error al crear el usuario' });
         }
+
+        //guardo el ID del user
+        const userId = result.insertId;
+        const token = jwt.sign({userId}, config.secretKey, {expiresIn : config.tokenExpiresIn});
+
         // Si no hay error, enviar la respuesta de éxito
-        res.status(201).json({ message: 'Usuario creado exitosamente!' });
+        res.status(201).json({
+            message: 'Usuario creado exitosamente!',
+            token: token,
+        });
     });
 };
 
