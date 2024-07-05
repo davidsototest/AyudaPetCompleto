@@ -27,34 +27,36 @@ const getUsers = (req, res) => {
 }
 //-------------------------  CREAR UN NUEVO USUARIO ------------------------------
 const createUser = (req, res) => {
-    const { Name, Ubication, Password, Phone, Email, status, imgUrl} = req.body;
+    const { name, ubication, password, phone, email, imgUrl} = req.body;
     // valido los campos
-    if(!Name || !Password || !Email){
+    if(!name || !password || !email || !ubication || !phone){
         return res.status(400).json({ message: 'Faltan datos requeridos'})
     }
 
     //Valido  que sea un mail 
-    if(!isValidEmail(Email)) {
+    if(!isValidEmail(email)) {
         return res.status(400).json({ message: 'Email invalido'})
     }
 
-    if(Phone && Phone.length < 10) {
-        return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
-    }
+    console.log("mail valido")
 
-    const hashedPassword = hashedPassword(Password);
+    // if(Phone && Phone.length < 10) {
+    //     return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
+    // }
 
-    //Insertar usuario en la base de datos!
-    const sqlInsertUser = 'INSERT INTO user (Name, Ubication, Password, Phone, Email, status, imgUrl) VALUES (?,?,?,?,?,?,?)';
-    db.query(sqlInsertUser, [Name, Ubication, hashedPassword, Phone, Email, status, imgUrl], (err, result) => {
-        if(err) {
-            if(err.code === 'ER_DUP_ENTRY') {
-                return res.status(400).json({message:'El usuario con el Email ya existe!'});
-           }
-           return res.status(500).json({message: 'Error al crear el usuario'})
-        }
-        res.status(201).json({message: 'Usuario creado exitosamente!'});
-    });
+    // const hashedPassword = hashedPassword(Password);
+
+    // //Insertar usuario en la base de datos!
+    // const sqlInsertUser = 'INSERT INTO user (Name, Ubication, Password, Phone, Email, status, imgUrl) VALUES (?,?,?,?,?,?,?)';
+    // db.query(sqlInsertUser, [Name, Ubication, hashedPassword, Phone, Email, status, imgUrl], (err, result) => {
+    //     if(err) {
+    //         if(err.code === 'ER_DUP_ENTRY') {
+    //             return res.status(400).json({message:'El usuario con el Email ya existe!'});
+    //        }
+    //        return res.status(500).json({message: 'Error al crear el usuario'})
+    //     }
+    //     res.status(201).json({message: 'Usuario creado exitosamente!'});
+    // });
 }
 
 // --------------------------------- MODIFICAR USUARIO POR ID ------------------------------------------
