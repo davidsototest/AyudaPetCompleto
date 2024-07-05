@@ -4,48 +4,54 @@ const db = require ('../config/dbConfig');
 const config = require('../config/config');
 const userModel = require('../models/userModel');
 
-const isValidEmail = (email) => {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()\[\]\\.,;:\s@"]+\.)+[^<>()\[\]\\.,;:\s@"]{2,})$/i;
-    return re.test(String(email).toLowerCase());
-};
-
-const hashedPassword = (Password) => {
-    const saltRounds = 10;
-    return bcrypt.hashSync(Password, saltRounds);
-};
-
 //-------------------------  CREAR UN NUEVO USUARIO ------------------------------
-const createUser = (req, res) => {
-    const { Name, Ubication, Password, Phone, Email, status, imgUrl} = req.body;
-    // valido los campos
-    if(!Name || !Password || !Email){
-        return res.status(400).json({ message: 'Faltan datos requeridos'})
+const createUser = async (req, res) => {
+    const { name, ubication, password, phone, email, status, imgUrl } = req.body;
+
+    // Función para hashear la contraseña
+    const hashPassword = (password) => {
+        const saltRounds = 10;
+        return bcrypt.hash(password, saltRounds);
+    };
+
+    // Valido los campos
+    if (!name || !password || !email || !status) {
+        return res.status(400).json({ message: 'Faltan datos requeridos' });
     }
 
-    //Valido  que sea un mail 
-    if(!isValidEmail(Email)) {
-        return res.status(400).json({ message: 'Email invalido'})
+    // Valido que sea un email
+    const isValidEmail =(email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    if (!isValidEmail(email)) {
+        return res.status(400).json({ message: 'Email inválido' });
     }
 
-    if(Phone && Phone.length < 10) {
-        return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
+    if (phone && phone.length < 10) {
+        return res.status(400).json({ message: 'El número de teléfono debe tener al menos 10 dígitos' });
     }
 
-    const hashedPassword = hashedPassword(Password);
+    try {
+        // Hasheo la contraseña
+        const hashedPwd = await hashPassword(password);
 
-    //Insertar usuario en la base de datos!
-    const sqlInsertUser = 'INSERT INTO user (Name, Ubication, Password, Phone, Email, status, imgUrl) VALUES (?,?,?,?,?,?,?)';
-    db.query(sqlInsertUser, [Name, Ubication, hashedPassword, Phone, Email, status, imgUrl], (err, result) => {
-        if(err) {
-            if(err.code === 'ER_DUP_ENTRY') {
-                return res.status(400).json({message:'El usuario con el Email ya existe!'});
-           }
-           return res.status(500).json({message: 'Error al crear el usuario'})
-        }
-        res.status(201).json({message: 'Usuario creado exitosamente!'});
-    });
-}
-
+        // Insertar usuario en la base de datos
+        const sqlInsertUser = 'INSERT INTO user (Name, Ubication, Password, Phone, Email, status, imgUrl) VALUES (?,?,?,?,?,?,?)';
+        db.query(sqlInsertUser, [name, ubication, hashedPwd, phone, email, status, imgUrl], (err, result) => {
+            if (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).json({ message: 'El usuario con el Email ya existe!' });
+                }
+                return res.status(500).json({ message: 'Error al crear el usuario', error: err.message });
+            }
+            res.status(201).json({ message: 'Usuario creado exitosamente!' });
+        });
+    } catch (err) {
+        res.status(500).json({ message: 'Error al hashear la contraseña', error: err.message });
+    }
+};
 // --------------------------------- MODIFICAR USUARIO POR ID ------------------------------------------
 const updateUser = (req,res) => {
     const userId = req.params.id;

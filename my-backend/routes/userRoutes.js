@@ -17,7 +17,6 @@ router.delete('/:id', userMiddleware, (req, res, next) => {
 // Definir las rutas y asociarlas con los controladores correspondientes
 // router.get('/', userController.getAllUsers);
 // router.get('/:id', userController.getUserById);
-// router.put('/:id', userController.updateUser);
 // router.delete('/:id', userController.deleteUser);
 
 module.exports = router;
