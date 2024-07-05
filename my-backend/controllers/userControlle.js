@@ -1,203 +1,219 @@
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcryptjs');
-const db = require ('../config/dbConfig');
-const config = require('../config/config');
-const userModel = require('../models/userModel');
 
-const isValidEmail = (email) => {
-    const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()\[\]\\.,;:\s@"]+\.)+[^<>()\[\]\\.,;:\s@"]{2,})$/i;
-    return re.test(String(email).toLowerCase());
-};
+const db = require("../config/dbConfig");
+const userModel = require("../models/userModel");
+const isValidEmail = require("../utils/emailValidator");
+const {
+  hashedPasswordUser,
+  comparePassword,
+} = require("../utils/hashedPasswordUser");
+const { generateToken, verifyToken } = require("../utils/authUtils");
 
-const hashedPasswordUser = (Password) => {
-    const saltRounds = 10;
-    return bcrypt.hashSync(Password, saltRounds);
-};
 //--------------------------OBTENER TODOS LOS USUARIOS---------------------------
-const getUsers = (req, res) => {
-    userModel.getAllUsers((err, results) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-        } else if (results.length === 0) {
-            res.status(404).json({ message: 'Usuario no encontrado' });
-        } else {
-            res.status(404).json(results);   
-        }       
-    });   
-}
+const getUsersCount = (req, res) => {
+  userModel.getUserCount((err, count) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ error: "Error al obtener el conteo de usuarios" });
+    }
+    res.json({ count: count });
+  });
+};
+
 //-------------------------  CREAR UN NUEVO USUARIO ------------------------------
 const createUser = async (req, res) => {
-    const { name, ubication, password, phone, email, imgUrl} = req.body;
-    // valido los campos
-    if(!name || !password || !email || !ubication || !phone){
-        return res.status(400).json({ message: 'Faltan datos requeridos'})
-    };
+  const { name, ubication, password, phone, email, imgUrl } = req.body;
+  // valido los campos
+  if (!name || !password || !email || !ubication || !phone) {
+    return res.status(400).json({ message: "Faltan datos requeridos" });
+  }
 
-    //Valido  que sea un mail 
-    if(!isValidEmail(email)) {
-        return res.status(400).json({ message: 'Email invalido'})
-    };
+  //Valido  que sea un mail
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ message: "Email invalido" });
+  }
 
-    //validar si el email ya esta registrado en la base de datos
-    try {
-        const userExist = await userModel.getUserExistsDB(email);
-        if(userExist){
-            return res.status(400).json({ message: 'El email ya esta siendo usado'})
-        };
-    } catch (error) {
-        res.status(500).json({ error: 'Error al verificar el email en DDBB ...' });
-    };
+  //validar si el email ya esta registrado en la base de datos
+  try {
+    const userExist = await userModel.getUserExistsDB(email);
+    if (userExist) {
+      return res.status(400).json({ message: "El email ya esta siendo usado" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: "Error al verificar el email en DDBB ..." });
+  }
 
-    //validar que el numero tenga 10 o mas digitos
-    if(phone.length < 10) {
-        return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
-    };
-
-    //hashar contrasenia
-    const hashedPassword = hashedPasswordUser(password);
-
-    //ahora que todo esta bien, envio todos los datos a la DDBB
-    //Insertar usuario en la base de datos!
-    const sqlInsertUser = 'INSERT INTO User (name, ubication, password, phone, email, status, imgUrl) VALUES (?,?,?,?,?,?,?)';
-    db.query(sqlInsertUser, [name, ubication, hashedPassword, phone, email, 1, imgUrl], (err, result) => {
-        if (err) {
-            // Manejo del error
-            console.error('Error al crear el usuario:', err); // Registro detallado del error
-            return res.status(500).json({ message: 'Error al crear el usuario' });
-        }
-
-        //guardo el ID del user
-        const userId = result.insertId;
-        const token = jwt.sign({userId}, config.secretKey, {expiresIn : config.tokenExpiresIn});
-
-        // Si no hay error, enviar la respuesta de éxito
-        res.status(201).json({
-            message: 'Usuario creado exitosamente!',
-            token: token,
-        });
+  //validar que el numero tenga 10 o mas digitos
+  if (phone.length < 10) {
+    return res.status(400).json({
+      message: "El numero de telefono debe tener al menos 10 digitos",
     });
+  }
+
+  //hashar contrasenia
+  const hashedPassword = hashedPasswordUser(password);
+
+  //ahora que todo esta bien, envio todos los datos a la DDBB
+  //Insertar usuario en la base de datos!
+  const sqlInsertUser =
+    "INSERT INTO User (name, ubication, password, phone, email, status, imgUrl) VALUES (?,?,?,?,?,?,?)";
+  db.query(
+    sqlInsertUser,
+    [name, ubication, hashedPassword, phone, email, 1, imgUrl],
+    (err, result) => {
+      if (err) {
+        // Manejo del error
+        console.error("Error al crear el usuario:", err); // Registro detallado del error
+        return res.status(500).json({ message: "Error al crear el usuario" });
+      }
+
+      //guardo el ID del user
+      const userId = result.insertId;
+
+      //genero el token
+      const token = generateToken(userId);
+
+      // Si no hay error, enviar la respuesta de éxito
+      res.status(201).json({
+        message: "Usuario creado exitosamente!",
+        token: token,
+      });
+    }
+  );
 };
 
-// --------------------------------- MODIFICAR USUARIO POR ID ------------------------------------------
-const updateUser = (req,res) => {
-    const userId = req.params.id;
-    const { Name, Ubication, Phone, Password, imgUrl } = req.body;
+// --------------------------------- MODIFICAR USUARIO POR ID ------PENDIENTE------------------------
+const updateUser = (req, res) => {
+  const userId = req.params.id;
+  const { Name, Ubication, Phone, Password, imgUrl } = req.body;
 
-    //valido los campos
-    if(!Name || !Ubication || !Phone || !Password || !imgUrl) {
-        return res.status(400).json({ message: 'Faltan datos en la peticion'});
+  //valido los campos
+  if (!Name || !Ubication || !Phone || !Password || !imgUrl) {
+    return res.status(400).json({ message: "Faltan datos en la peticion" });
+  }
+  //validar el usuario
+  const sqlUser = "SELECT id FROM user WHERE id = ?";
+  db.query(sqlUser, [userId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "Error en la base de datos" });
     }
-    //validar el usuario
-    const sqlUser ='SELECT id FROM user WHERE id = ?';
-    db.query(sqlUser, [userId],(err,results) => {
-        if(err){
-            return res.status(500).json({ message: 'Error en la base de datos'});
+    if (results.length === 0) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+    //validar el formato del numero
+    if (Phone.length < 10) {
+      return res.status(400).json({
+        message: "El numero de telefono debe tener al menos 10 digitos",
+      });
+    }
+    //actualizar datos del usuario
+    const sqlUpdate =
+      "UPDATE user SET Name = ?, Ubication = ?, Phone = ?, Password = ?, imgUrl = ? WHERE id = ?";
+    db.query(
+      sqlUpdate,
+      [Name, Ubication, Phone, Password, imgUrl, userId],
+      (err, results) => {
+        if (err) {
+          return res.status(500).json({
+            message: "Error al actualizar el usuario",
+            error: err.message,
+          });
         }
-        if(results.length === 0) {
-            return res.status(404).json({ message: 'Usuario no encontrado'});
-        }
-        //validar el formato del numero
-        if(Phone.length < 10) {
-            return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
-        }
-        //actualizar datos del usuario
-        const sqlUpdate = 'UPDATE user SET Name = ?, Ubication = ?, Phone = ?, Password = ?, imgUrl = ? WHERE id = ?';
-        db.query(sqlUpdate, [Name, Ubication, Phone, Password, imgUrl, userId],(err,results) => {
-            if(err) {
-                return res.status(500).json({ message: 'Error al actualizar el usuario', error: err.message});
-            }
-            res.json({message: 'Usuario modificado exitosamente!!'});
-        });
-
-    });
+        res.json({ message: "Usuario modificado exitosamente!!" });
+      }
+    );
+  });
 };
 
-//------------------------------------------------------------------------------------------
-// REGISTRO ALTERNATIVO HECHO POR NICOLAS 
-// const register = (req, res) => {
-//     const newUser = req.body;
-//     // valido los campos
-//     if(!newUser.name || !newUser.password || !newUser.email || !newUser.ubication || !newUser.phone || !newUser.imgUrl){
-//         return res.status(400).json({ message: 'Faltan datos requeridos'});
-//     }
+//------------------------LOGIN USER-----------------------------------
+const loginUser = (req, res) => {
+  const { email, password } = req.body;
 
-//     // //Valido  que sea un mail 
-//     if(!isValidEmail(newUser.email)) {
-//         return res.status(400).json({ message: 'Email invalido'});
-//     }
+  //validar que llegen todos los datos
+  if (!email || !password) {
+    return res.status(400).json({ message: "Faltan datos requeridos" });
+  }
 
-//     if(newUser.phone && newUser.phone.length < 10) {
-//         return res.status(400).json({ message: 'El numero de telefono debe tener al menos 10 digitos'});
-//     }
-//     const hashedPassword = bcrypt.hashSync(newUser.password, 8);
-//     newUser.password = hashedPassword;
+  userModel.getUser(email, (err, result) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (result.length === 0) {
+      res.status(404).json({ message: "Usuario no encontrado" });
+    } else {
+      //comparar contrasenias
+      const passwordIsValid = comparePassword(password, result.password);
 
-//     userModel.create(newUser, (err, result) => {
-//         if (err) {
-//             res.status(500).json({ error: err.message });
-//         } else {
-//             res.status(201).json({ message: 'Usuario creado', userId: result.insertId });
+      //responder que un dato es incorrecto
+      if (!passwordIsValid) {
+        return res
+          .status(400)
+          .json({ message: "Email o contraseña incorrectos" });
+      }
 
-//             const token = jwt.sign({ id: newUser.id}, config.secretKey, {expiresIn : config.tokenExpiresIn});
+      //genero el token
+      const token = generateToken(result.id);
 
-//             res.status(201).send({ auth : true, token});
-//         }       
-//     });
-// }
-
-const login = (req, res) => {
-    const { email, password } = req.body;
-
-    if(!email || !password){
-        return res.status(400).json({ message: 'Faltan datos requeridos'});
+      res.status(200).send({ auth: true, token: token });
     }
+  });
+};
 
-    userModel.getUser(email, (err, result) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-        } else if (result.length === 0) {
-            res.status(404).json({ message: 'Usuario no encontrado' });
-        } else {
-            //const passwordIsValid = bcrypt.compareSync(password, result[0].password);
-            //Comentada la linea de arriba porque nuestras contraseñas no estan encriptadas
-            const passwordIsValid = password === result[0].password ;
-            if(!passwordIsValid) return res.status(401).send({auth : false, token : null});
+//----------------------------DELETE USER--------------------------------------
+const deleteUser = async (req, res) => {
+  const { id } = req.body;
+  let token = req.headers["authorization"];
 
-            const token = jwt.sign({id : result[0].id}, config.secretKey, {expiresIn : config.tokenExpiresIn});
+  // Eliminar el prefijo "Bearer" si está presente
+  if (token.startsWith("Bearer ")) {
+    token = token.slice(7, token.length); // "Bearer " tiene 7 caracteres
+  }
 
-            res.status(200).send({auth : true, token});     
-        }       
-    });   
-}
-//----------------------------DELETE--------------------------------------------------------------------
-const deleteUser = (req, res) =>{
-    const { id } = req.params;
+  //validar que enviaron el id y token
+  if (!id || !token) {
+    return res.status(400).json({ message: "Faltan datos requeridos" });
+  }
 
-    // Validar que el usuario existe
-    const sql = 'SELECT * FROM user WHERE id = ?';
-    db.query(sql, [id], (err, result) => {
-        if (err) {
-            return res.status(500).json({ message: 'Error en la base de datos', error: err.message });
-        }
-        if(result.length === 0 || result[0].status == 0) return res.status(404).send({ "message": "Usuario no encontrado." });
+  // Validar que el token sea válido
+  try {
+    const decoded = await verifyToken(token);
+    const isValidToken = (token = decoded);
+    if (!isValidToken) {
+      return res.status(401).json({ message: "Token inválido o expirado ..." });
+    }
+  } catch (error) {
+    return res.status(401).json({ message: "Token inválido o expirado" });
+  }
 
-        // "Eliminar" el usuario
-        const sqlUpdate = 'UPDATE user SET status = 0 WHERE id = ?;';
-        db.query(sqlUpdate, [id], (err, result) => {
-            if (err) {
-                return res.status(500).json({ message: 'Error al eliminar el usuario', error: err.message });
-            }
-            res.status(204).send('Usuario eliminado exitosamente.') ;           
+  // Validar que el usuario existe
+  const sql = "SELECT * FROM User WHERE id = ?";
+  db.query(sql, [id], (err, result) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ message: "Error en la base de datos", error: err.message });
+    }
+    if (result.length === 0 || result[0].status == 0)
+      return res.status(404).send({ message: "Usuario no encontrado." });
+
+    // "Eliminar" el usuario
+    const sqlUpdate = "UPDATE User SET status = 0 WHERE id = ?;";
+    db.query(sqlUpdate, [id], (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Error al eliminar el usuario",
+          error: err.message,
         });
-        
+      }
+      res.status(202).json({ message: "Usuario eliminado exitosamente." });
     });
-}
-//-------------------------------------------------------------------------------------------------------
- module.exports = {
-    getUsers,
-    createUser,
-    updateUser, 
-    //register,
-    login, 
-    deleteUser
- };
+  });
+};
+
+//----------------------EXPORTACIONES--------------------------------
+module.exports = {
+  getUsersCount,
+  createUser,
+  updateUser,
+  loginUser,
+  deleteUser,
+};

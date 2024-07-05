@@ -2,23 +2,23 @@
 const db = require('../config/dbConfig');
 
 
-//Obtengo los usuarios
-const getAllUsers = (callback) => {
-    db.query('SELECT id, name, ubication, phone, email, status, imgUrl FROM User', (err, results) => {
+//Obtengo la cantidad de usuarios en la tabla User
+const getUserCount = (callback) => {
+    db.query('SELECT COUNT(*) AS count FROM User', (err, results) => {
         if (err) {
             return callback(err);
         }
-        callback(null, results);
+        callback(null, results[0].count);
     });
 };
 
 //Obtengo el usuario por el email
-const getUser = (userEmail, callback) => {
-    db.query('SELECT * FROM User WHERE email = ?', [userEmail], (err, results) => {
+const getUser = (email, callback) => {
+    db.query('SELECT * FROM User WHERE email = ?', [email], (err, results) => {
         if (err) {
             return callback(err);
         }
-        callback(null, results);
+        callback(null, results[0]);
     });
 };
 
@@ -46,10 +46,9 @@ const create = (newUser, callback) => {
 };
 
 module.exports = {
-    getAllUsers,
     create,
     getUser,
-    getAllUsers,
+    getUserCount,
     getUserExistsDB
 }
 // // Obtener todos los usuarios
