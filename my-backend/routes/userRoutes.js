@@ -10,5 +10,6 @@ router.put("/:id", userController.updateUser); //actualziar datos del usuario
 router.post("/loginUser", userController.loginUser); //loguear usuario
 router.delete("/deleteUser", userController.deleteUser); //dar de baja usuario
 router.get("/userCount", userController.getUsersCount); //saber la cantidad de usuarios registrados
+router.get('/', userController.getUsers);
 
 module.exports = router;

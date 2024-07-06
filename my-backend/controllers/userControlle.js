@@ -208,7 +208,18 @@ const deleteUser = async (req, res) => {
     });
   });
 };
-
+//-------------------------------------------------------------------
+const getUsers = (req, res) => {
+  userModel.getAllUsers((err, results) => {
+      if (err) {
+          res.status(500).json({ error: err.message });
+      } else if (results.length === 0) {
+          res.status(404).json({ message: 'Usuario no encontrado' });
+      } else {
+          res.status(404).json(results);   
+      }       
+  });   
+}
 //----------------------EXPORTACIONES--------------------------------
 module.exports = {
   getUsersCount,
@@ -216,4 +227,5 @@ module.exports = {
   updateUser,
   loginUser,
   deleteUser,
+  getUsers
 };
