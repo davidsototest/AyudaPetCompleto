@@ -11,6 +11,7 @@ const getAllPublications = (req, res) => {
                 JOIN Pet ON pub.pet_id = Pet.id
                 WHERE pub.status != 0`;
   db.query(sql, (err, results) => {
+    console.log(results)
     if (results == "")
       return res
         .status(204)
@@ -309,6 +310,21 @@ const deleteComment = (req, res) => {
     });
   });
 };
+
+// consultar la cantidad de publicaciones activas
+const getPublicationsCount = (req, res) => {
+  console.log("aqui")
+  publicationModel.getPublicationCount((err, count) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ error: "Error al obtener el conteo de publicaciones" });
+    }
+    res.json({ count: count });
+  });
+};
+
+
 //-------------------EXPORTS--------------------------------------
 module.exports = {
   getAllPublications,
@@ -318,4 +334,5 @@ module.exports = {
   updateComment,
   deletePublication,
   deleteComment,
+  getPublicationsCount
 };

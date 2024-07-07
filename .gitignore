@@ -3,6 +3,7 @@ node_modules/
 
 # Archivos de configuración locales
 .env
+.env.production
 
 # Archivos de registro y archivos temporales
 logs/

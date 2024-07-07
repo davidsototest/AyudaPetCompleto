@@ -29,6 +29,17 @@ const getPublicationById= (publicationId, callback) => {
     });
 };
 
+//Obtengo la cantidad de publicaciones en la tabla Publications
+const getPublicationCount = (callback) => {
+    db.query('SELECT COUNT(*) AS count FROM Publications', (err, results) => {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, results[0].count);
+    });
+};
+
 module.exports = {
-    getPublicationById
+    getPublicationById,
+    getPublicationCount
 }

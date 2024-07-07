@@ -15,6 +15,7 @@ router.delete('/:id', publicationMiddleware, (req, res, next) => {
 }, publicationController.deletePublication);
 router.delete('/:publicationId/comment/:id', publicationMiddleware, (req, res, next) => {
     next()
-}, publicationController.deleteComment)
+}, publicationController.deleteComment);
+router.get('/publicationCount', publicationController.getPublicationsCount);
 
 module.exports = router;
