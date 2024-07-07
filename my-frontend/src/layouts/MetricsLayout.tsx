@@ -52,6 +52,8 @@ const Metrics: React.FC<Props> = (Props) => {
       spacing={{ xs: 0, md: 5 }}
       padding={8}
       rowSpacing={{ xs: 3, md: 0 }}
+      className="animate__animated animate__bounceIn"
+      display="flex"
     >
       <Grid xs={12} md={3} alignContent={"center"}>
         <Typography variant="h4" color="primary" textAlign="center" padding={4}>
@@ -61,7 +63,7 @@ const Metrics: React.FC<Props> = (Props) => {
 
       <Grid xs={12} md={3}>
         <Paper
-          style={{ padding: 20, textAlign: "center" }}
+          style={{ padding: 20, textAlign: "center"}}
           sx={{ backgroundColor: "rgba(0, 0, 0, 0.2)" }}
         >
           <Typography variant="h3" marginBottom={1.5} color="primary.light">

@@ -4,7 +4,7 @@ import Banner from '../layouts/Banner';
 import CardsTree from '../layouts/CardsTree';
 import HelpPet from '../layouts/HelpPet';
 import PublicationsInfo from '../layouts/PublicationsInfo';
-import Metrics from '../layouts/Metrics';
+import Metrics from '../layouts/MetricsLayout';
 import Sponsors from '../layouts/Sponsors';
 import { maxWidth } from '../layouts/width';
 import { mainInfo, detailInfo } from "../components/data/publicationInfoHome";

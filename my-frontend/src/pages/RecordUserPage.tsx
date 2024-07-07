@@ -8,7 +8,7 @@ import {
   detailInfo,
 } from "../components/data/publicationInfoRegister";
 import HelpPet from "../layouts/HelpPet";
-import Metrics from "../layouts/Metrics";
+import Metrics from "../layouts/MetricsLayout";
 
 interface Props {
   // Define props here

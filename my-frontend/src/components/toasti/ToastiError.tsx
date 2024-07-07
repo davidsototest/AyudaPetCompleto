@@ -4,7 +4,7 @@ import 'toastify-js/src/toastify.css';
 export const ToastiError = (message: string) => {
     Toastify({
         text: message,
-        duration: 3000,
+        duration: 8000,
         newWindow: true,
         gravity: "bottom", // `top` or `bottom`
         position: "right", // `left`, `center` or `right`

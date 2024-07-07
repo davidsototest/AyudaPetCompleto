@@ -1,5 +1,4 @@
 
-import { useTheme } from '@mui/material';
 import Toastify from 'toastify-js';
 import 'toastify-js/src/toastify.css';
 
@@ -9,7 +8,7 @@ export const ToastiSuccess = (message: string) => {
 
     Toastify({
         text: message,
-        duration: 3000,
+        duration: 8000,
         // destination: "https://github.com/apvarun/toastify-js",
         newWindow: true,
         // close: true,

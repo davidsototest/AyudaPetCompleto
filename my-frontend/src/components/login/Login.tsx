@@ -15,6 +15,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import loginService from "../../services/login/loginService";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // Define la interfaz Credentials
 interface Credentials {
@@ -39,8 +41,10 @@ interface Props {
 }
 
 const Login: React.FC<Props> = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const [openBackdrop, setOpenBackdrop] = React.useState(false);
+  const { login } = useAuth();
 
   const backdropToasti = () => {
     ToastiError("¡Espere mientras lo registramos! ⏳");
@@ -59,17 +63,13 @@ const Login: React.FC<Props> = () => {
     setOpenBackdrop(true);
 
     try {
-      const token = await loginService(credentials);
-      console.log("Token de comp: " + token);
-      sessionStorage.setItem("token", token);
-      // Redirige al usuario a la página principal después de iniciar sesión
-      // history.push("/home");
+      await login(credentials);
+      navigate("/publications");
     } catch (error) {
       console.error("Error en el inicio de sesión:", error);
-    };
-    setOpenBackdrop(false);
-    ToastiSuccess("... ¡Su registro ha sido EXITOSO! ✅");
-    reset();
+    } finally {
+      setOpenBackdrop(false);
+    }
   };
 
   return (

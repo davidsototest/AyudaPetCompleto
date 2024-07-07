@@ -6,11 +6,7 @@ import {
   Avatar,
   Backdrop,
   CircularProgress,
-  Container,
-  Box,
-  FormControlLabel,
-  Checkbox,
-  Link,
+  MenuItem,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React, { useState } from "react";
@@ -21,7 +17,11 @@ import { avatarDefault } from "../data/avatarDefault";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { ToastiError } from "../toasti/ToastiError";
 import { ToastiSuccess } from "../toasti/ToastiSuccess";
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import provinciasArgentina from "../data/provincias";
+import singInService, {
+  CredentialsSingIn,
+} from "../../services/register/singInService";
 
 interface Props {
   // Define props here
@@ -37,11 +37,29 @@ const schema = yup.object().shape({
     .string()
     .min(8, "La contraseña debe tener al menos 8 caracteres")
     .required("Contraseña es requerida"),
-  confirmPassword: yup
+  name: yup
     .string()
-    .oneOf([yup.ref("password"), undefined], "Las contraseñas deben coincidir")
-    .required("Confirmación de contraseña es requerida"),
+    .min(3, "El nombre debe tener al menos 3 caracteres")
+    .max(20, "El nombre no puede tener más de 20 caracteres")
+    .required("El nombre es requerido"),
+  ubication: yup
+    .string()
+    .oneOf(provinciasArgentina, "Selecciona una ubicación válida")
+    .required("La ubicación es requerida"),
+  phone: yup
+    .string()
+    .matches(/^\d{10}$/, "El teléfono debe tener 10 dígitos")
+    .required("El teléfono es requerido"),
 });
+
+//interfaz del formulario sin imagen
+interface CredentialsSinImg {
+  name: string;
+  password: string;
+  ubication: string;
+  phone: string;
+  email: string;
+}
 
 const RegisterUser: React.FC<Props> = (Props) => {
   const theme = useTheme();
@@ -83,101 +101,45 @@ const RegisterUser: React.FC<Props> = (Props) => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: any) => {
+  //enviamos todo al servicio
+  const onSubmitSingIn = async (data: CredentialsSinImg) => {
     setOpenBackdrop(true);
-
-    setTimeout(() => {
-      setOpenBackdrop(false);
+    try {
+      console.log("Datos del formulario:", data);
+      const formData: CredentialsSingIn = { ...data, imgUrl: avatarDefa };
+      const token = await singInService(formData);
+      console.log("Token recibido:", token);
       ToastiSuccess("... ¡Su registro ha sido EXITOSO! ✅");
-      console.log(data);
-      reset();
-    }, 5000);
-    // envío del formulario
+      reset(); // Limpia el formulario después de un registro exitoso
+    } catch (error) {
+      console.error("Error al enviar el formulario:", error);
+      ToastiError("Hubo un error al registrar. Por favor, inténtelo de nuevo.");
+    } finally {
+      setOpenBackdrop(false);
+    }
   };
 
   return (
-    // <Container component="main" maxWidth="xs">
-    //   {/* <CssBaseline /> */}
-    //   <Box
-    //     sx={{
-    //       marginTop: 8,
-    //       display: "flex",
-    //       flexDirection: "column",
-    //       alignItems: "center",
-    //     }}
-    //   >
-    //     <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-    //       <LockOutlinedIcon />
-    //     </Avatar>
-    //     <Typography component="h1" variant="h5">
-    //       Sign in
-    //     </Typography>
-    //     <Box component="form" noValidate sx={{ mt: 1 }}>
-    //       <TextField
-    //         margin="normal"
-    //         required
-    //         fullWidth
-    //         id="email"
-    //         label="Email Address"
-    //         name="email"
-    //         autoComplete="email"
-    //         autoFocus
-    //       />
-    //       <TextField
-    //         margin="normal"
-    //         required
-    //         fullWidth
-    //         name="password"
-    //         label="Password"
-    //         type="password"
-    //         id="password"
-    //         autoComplete="current-password"
-    //       />
-    //       <FormControlLabel
-    //         control={<Checkbox value="remember" color="primary" />}
-    //         label="Remember me"
-    //       />
-    //       <Button
-    //         type="submit"
-    //         fullWidth
-    //         variant="contained"
-    //         sx={{ mt: 3, mb: 2 }}
-    //       >
-    //         Sign In
-    //       </Button>
-    //       <Grid container>
-    //         <Grid xs>
-    //           <Link href="#" variant="body2">
-    //             Forgot password?
-    //           </Link>
-    //         </Grid>
-    //         <Grid >
-    //           <Link href="#" variant="body2">
-    //             {"Don't have an account? Sign Up"}
-    //           </Link>
-    //         </Grid>
-    //       </Grid>
-    //     </Box>
-    //   </Box>
-    // </Container>
+    <form onSubmit={handleSubmit(onSubmitSingIn)}>
     <Grid
       container
       rowSpacing={4}
       bgcolor={theme.palette.primary.light}
-      padding={3}
+      padding={4}
       borderRadius="15px"
       justifyContent="center"
       maxWidth="500px"
     >
-        <Grid xs={10} textAlign="center">
-          <Typography
-            variant="h3"
-            color={theme.palette.primary.main}
-            className="animate__animated animate__backInDown"
-          >
-            Registro de Nuevos Usuarios
-          </Typography>
-        </Grid>
+      <Grid xs={10} textAlign="center">
+        <Typography
+          variant="h3"
+          color={theme.palette.primary.main}
+          className="animate__animated animate__backInDown"
+        >
+          Registro de Nuevos Usuarios
+        </Typography>
+      </Grid>
+      
         <Grid xs={12}>
           <Controller
             name="email"
@@ -219,20 +181,62 @@ const RegisterUser: React.FC<Props> = (Props) => {
         </Grid>
         <Grid xs={12}>
           <Controller
-            name="confirmPassword"
+            name="name"
             control={control}
             defaultValue=""
             render={({ field }) => (
               <TextField
                 {...field}
-                label="Confirmar contraseña"
-                type="password"
+                label="Nombre"
                 variant="outlined"
                 fullWidth
-                error={!!errors.confirmPassword}
-                helperText={
-                  errors.confirmPassword ? errors.confirmPassword.message : ""
-                }
+                error={!!errors.name}
+                helperText={errors.name ? errors.name.message : ""}
+                required
+                className="animate__animated animate__fadeIn"
+              />
+            )}
+          />
+        </Grid>
+        <Grid xs={12}>
+          <Controller
+            name="ubication"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                select
+                label="Ubicación"
+                variant="outlined"
+                fullWidth
+                error={!!errors.ubication}
+                helperText={errors.ubication ? errors.ubication.message : ""}
+                required
+                className="animate__animated animate__fadeIn"
+              >
+                {provinciasArgentina.map((location) => (
+                  <MenuItem key={location} value={location}>
+                    {location}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
+          />
+        </Grid>
+        <Grid xs={12}>
+          <Controller
+            name="phone"
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Teléfono"
+                variant="outlined"
+                fullWidth
+                error={!!errors.phone}
+                helperText={errors.phone ? errors.phone.message : ""}
                 required
                 className="animate__animated animate__fadeIn"
               />
@@ -240,14 +244,7 @@ const RegisterUser: React.FC<Props> = (Props) => {
           />
         </Grid>
         <Grid xs={6} justifyContent="center" display="flex">
-          <Grid
-            container
-            display="flex"
-            justifyContent="center"
-            // width='100%'
-            // marginTop={2}
-            // columnSpacing={4}
-          >
+          <Grid container display="flex" justifyContent="center">
             <Grid
               xs={6}
               display="flex"
@@ -268,7 +265,6 @@ const RegisterUser: React.FC<Props> = (Props) => {
               justifyContent="center"
               alignContent="center"
               className="animate__animated animate__fadeIn animate__delay-1s"
-              // display='flex'
             >
               <Typography style={{ marginBottom: "10px" }}>
                 Cambiar Avatar
@@ -293,21 +289,22 @@ const RegisterUser: React.FC<Props> = (Props) => {
           className="animate__animated animate__fadeIn animate__delay-1s"
         >
           <button
+            type="submit"
             className="button button-secundary"
-            onClick={handleSubmit(onSubmit)}
             style={{ maxHeight: "50px" }}
           >
             {"Registrar  >>"}
           </button>
         </Grid>
-        <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={openBackdrop}
-          onClick={backdropToasti}
-        >
-          <CircularProgress color="primary" />
-        </Backdrop>
-    </Grid>
+      
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={openBackdrop}
+        onClick={backdropToasti}
+      >
+        <CircularProgress color="primary" />
+      </Backdrop>
+    </Grid></form>
   );
 };
 

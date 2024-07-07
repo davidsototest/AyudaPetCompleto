@@ -12,16 +12,20 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import PetsIcon from "@mui/icons-material/Pets";
-import { routes, RouteItem } from "../routes";
+import { getRoutes, RouteItem } from "../route/routes";
 import ButtonHeader from "../components/buttons/ButtonHeader";
+import { useAuth } from "../context/AuthContext";
 
 interface HeaderProps {}
-
-const routesDesktop = [...routes].reverse();
 
 const Header: React.FC<HeaderProps> = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  //valido si tengo algun usuario activo para cambiar los botones
+  const { token } = useAuth();
+  const routes = getRoutes(token);
+  const routesDesktop = [...routes].reverse();
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -41,7 +45,13 @@ const Header: React.FC<HeaderProps> = () => {
   };
 
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: 'rgba(36, 27, 53, 0.95)', borderRadius: "0% 0% 20px 20px" }}>
+    <AppBar
+      position="fixed"
+      sx={{
+        backgroundColor: "rgba(36, 27, 53, 0.95)",
+        borderRadius: "0% 0% 20px 20px",
+      }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           {/* Desktop  */}
@@ -119,7 +129,7 @@ const Header: React.FC<HeaderProps> = () => {
               onClose={handleCloseNavMenu}
               sx={{
                 display: { xs: "block", md: "none" },
-                background: 'rgba(36, 27, 53, 0.5)'
+                background: "rgba(36, 27, 53, 0.5)",
               }}
             >
               {routes.map((route: RouteItem) => (
@@ -128,7 +138,9 @@ const Header: React.FC<HeaderProps> = () => {
                   onClick={() => handleNavigate(route.path)}
                   // sx={{background: 'rgba(36, 27, 53, 0.95)'}}
                 >
-                  <Typography textAlign="center" variant="h5" padding={2}>{route.name}</Typography>
+                  <Typography textAlign="center" variant="h5" padding={2}>
+                    {route.name}
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
