@@ -22,6 +22,8 @@ import provinciasArgentina from "../data/provincias";
 import singInService, {
   CredentialsSingIn,
 } from "../../services/register/singInService";
+import { useAuth } from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   // Define props here
@@ -63,6 +65,8 @@ interface CredentialsSinImg {
 
 const RegisterUser: React.FC<Props> = (Props) => {
   const theme = useTheme();
+  const {singIn} = useAuth();
+  const navigate = useNavigate();
   const [avatarDefa, setAvatarDefa] = useState(avatarDefault[0].url);
   const [number, setNumber] = useState(0);
   const [avatarStyle, setAvatarStyle] = useState(
@@ -101,22 +105,21 @@ const RegisterUser: React.FC<Props> = (Props) => {
     resolver: yupResolver(schema),
   });
 
-  //enviamos todo al servicio
+  //enviamos todo al contexto y del contexto al servicio
   const onSubmitSingIn = async (data: CredentialsSinImg) => {
     setOpenBackdrop(true);
     try {
-      console.log("Datos del formulario:", data);
       const formData: CredentialsSingIn = { ...data, imgUrl: avatarDefa };
-      const token = await singInService(formData);
-      console.log("Token recibido:", token);
+      await singIn(formData);
+      console.log("singIn ejecutado:");
       ToastiSuccess("... ¡Su registro ha sido EXITOSO! ✅");
-      reset(); // Limpia el formulario después de un registro exitoso
+      navigate("/publications");
     } catch (error) {
       console.error("Error al enviar el formulario:", error);
       ToastiError("Hubo un error al registrar. Por favor, inténtelo de nuevo.");
     } finally {
       setOpenBackdrop(false);
-    }
+    };
   };
 
   return (
@@ -130,7 +133,7 @@ const RegisterUser: React.FC<Props> = (Props) => {
       justifyContent="center"
       maxWidth="500px"
     >
-      <Grid xs={10} textAlign="center">
+      <Grid xs={10} md={12} textAlign="center">
         <Typography
           variant="h3"
           color={theme.palette.primary.main}
