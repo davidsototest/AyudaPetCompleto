@@ -4,45 +4,41 @@ const publicationModel = require("../models/publicationModel");
 
 //--------------------TRAER TODAS LAS PUBLICACIONES-----------------------
 const getAllPublications = (req, res) => {
-  const sql = `SELECT pub.id, pub.status, pub.date,
-                    User.name, User.ubication, User.phone, User.email, User.status as status_user, User.imgUrl as imgUrl_user,
-                    Pet.name as name_pet, Pet.raze, pet.age, Pet.color, pet.size, Pet.imgUrl as imgUrl_pet from Publications pub 
-                JOIN User ON pub.user_id = User.id 
-                JOIN Pet ON pub.pet_id = Pet.id
-                WHERE pub.status != 0`;
+  const sql = `SELECT 
+    p.id AS publication_id,
+    p.date AS publication_date,
+    p.description AS publication_description,
+    p.status AS publication_status,
+    u.name AS user_name,
+    u.id AS user_id,
+    u.ubication AS user_ubication,
+    u.imgUrl AS user_imgUrl,
+    pt.name AS pet_name,
+    pt.raze AS pet_raze,
+    pt.age AS pet_age,
+    pt.color AS pet_color,
+    pt.size AS pet_size,
+    pt.imgUrl AS pet_imgUrl
+FROM 
+    bwarjdqn35lidbfwqtyy.Publications p
+JOIN 
+    bwarjdqn35lidbfwqtyy.User u ON p.user_id = u.id
+JOIN 
+    bwarjdqn35lidbfwqtyy.Pet pt ON p.pet_id = pt.id
+WHERE 
+    p.status IN (1, 2);`;
   db.query(sql, (err, results) => {
-    console.log(results)
-    if (results == "")
+    // console.log(results)
+    if (err) {
       return res
-        .status(204)
-        .send({ message: "No existe datos para la solicitud." });
-    const publications = [];
-    for (let i = 0; i < results.length; i++) {
-      publications.push({
-        id: results[i].id,
-        status: results[i].status,
-        date: results[i].date,
-        user: {
-          name: results[i].name,
-          ubication: results[i].ubication,
-          phone: results[i].phone,
-          email: results[i].email,
-          status: results[i].status,
-          imgUrl: results[i].imgUrl_user,
-        },
-        pet: {
-          name: results[i].name_pet,
-          raze: results[i].raze,
-          age: results[i].age,
-          color: results[i].color,
-          size: results[i].size,
-          imgUrl: results[i].imgUrl_pet,
-        },
-      });
+        .status(500)
+        .send({ message: "Error en el servidor al procesar la solicitud.", error: err });
     }
-    res.json(publications);
+    res.status(200).json(results);
   });
 };
+
+
 //---------------------TRAER PUBLICACIONES POR ID---------------------------
 const getPublicationById = (req, res) => {
   const { id } = req.params;
@@ -96,6 +92,8 @@ const getPublicationById = (req, res) => {
     }
   });
 };
+
+
 //-------------------------------- CREAR PUBLICACION-----------------------------------------------
 const createPublication = (req, res) => {
   const { status, date, description, user_id, pet_id } = req.body;
@@ -123,25 +121,22 @@ const createPublication = (req, res) => {
       [user_id, pet_id, status, date, description],
       (err, result) => {
         if (err) {
-          return res
-            .status(500)
-            .json({
-              message: "Error al crear la publicación",
-              error: err.message,
-            });
-        }
-        res
-          .status(201)
-          .json({
-            message: "Publicación creada exitosamente",
-            publicationId: result.insertId,
+          return res.status(500).json({
+            message: "Error al crear la publicación",
+            error: err.message,
           });
+        }
+        res.status(201).json({
+          message: "Publicación creada exitosamente",
+          publicationId: result.insertId,
+        });
       }
     );
   });
 };
-// ------------------------------------- MODIFICAR PUBLICACION ID --------------------------------------------
 
+
+// ------------------------------------- MODIFICAR PUBLICACION ID --------------------------------------------
 const updatePublication = (req, res) => {
   const publicationId = req.params.id;
   const { status, date, description, user_id, pet_id } = req.body;
@@ -169,12 +164,10 @@ const updatePublication = (req, res) => {
       [status, date, description, user_id, pet_id, publicationId],
       (err, result) => {
         if (err) {
-          return res
-            .status(500)
-            .json({
-              message: "Error al actualizar la publicación",
-              error: err.message,
-            });
+          return res.status(500).json({
+            message: "Error al actualizar la publicación",
+            error: err.message,
+          });
         }
         res.json({ message: "Publicación modificada exitosamente" });
       }
@@ -226,18 +219,18 @@ const updateComment = (req, res) => {
       const sqlUpdate = "UPDATE comments SET content = ? WHERE id = ?";
       db.query(sqlUpdate, [content, commentId], (err, results) => {
         if (err) {
-          return res
-            .status(500)
-            .json({
-              message: "Error al actualizar el comentario",
-              error: err.message,
-            });
+          return res.status(500).json({
+            message: "Error al actualizar el comentario",
+            error: err.message,
+          });
         }
         res.json({ message: "Comentario modificado exitosamente." });
       });
     });
   });
 };
+
+
 //--------------------DELETE PUBLICACION--------------------------
 const deletePublication = (req, res) => {
   const { id } = req.params;
@@ -257,17 +250,17 @@ const deletePublication = (req, res) => {
     const sqlUpdate = "UPDATE publications SET status = 0 WHERE id = ?;";
     db.query(sqlUpdate, [id], (err, result) => {
       if (err) {
-        return res
-          .status(500)
-          .json({
-            message: "Error al eliminar el comentario",
-            error: err.message,
-          });
+        return res.status(500).json({
+          message: "Error al eliminar el comentario",
+          error: err.message,
+        });
       }
       res.status(204).send("Publicación eliminada exitosamente.");
     });
   });
 };
+
+
 //-------------------DELETE COMMENT--------------------------------------------------------------
 const deleteComment = (req, res) => {
   const { publicationId, id } = req.params;
@@ -298,12 +291,10 @@ const deleteComment = (req, res) => {
       const sqlUpdate = "UPDATE comments SET status = 0 WHERE id = ?;";
       db.query(sqlUpdate, [id], (err, result) => {
         if (err) {
-          return res
-            .status(500)
-            .json({
-              message: "Error al eliminar el comentario",
-              error: err.message,
-            });
+          return res.status(500).json({
+            message: "Error al eliminar el comentario",
+            error: err.message,
+          });
         }
         res.status(204).send("Publicación eliminada exitosamente.");
       });
@@ -313,7 +304,7 @@ const deleteComment = (req, res) => {
 
 // consultar la cantidad de publicaciones activas
 const getPublicationsCount = (req, res) => {
-  console.log("aqui")
+  console.log("aqui");
   publicationModel.getPublicationCount((err, count) => {
     if (err) {
       return res
@@ -324,7 +315,6 @@ const getPublicationsCount = (req, res) => {
   });
 };
 
-
 //-------------------EXPORTS--------------------------------------
 module.exports = {
   getAllPublications,
@@ -334,5 +324,5 @@ module.exports = {
   updateComment,
   deletePublication,
   deleteComment,
-  getPublicationsCount
+  getPublicationsCount,
 };

@@ -14,31 +14,38 @@ import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React, { useState } from "react";
 import { PetInfo } from "../data/petInfo";
 import ModalPublication from "../modal/ModalPublication";
-import { comments } from "../data/commentsTest";
-
-// img1_src: img pet
-// img1_alt: img pet
-// strong_text: name pet
-// height: height pet
-// color: color pet
-// race: race pet
-// img2_src: img user
-// img2_alt: img user
-// span1_text: name user
-// span2_text: ubication user
-
-
+// import { comments } from "../data/commentsTest";
+import { Publication, usePublications } from "../../context/PublicationsContext";
+import { Padding } from "@mui/icons-material";
 
 interface CardSmallProps {
-  petInfo: PetInfo;
+  petInfo: Publication;
   skeleton?: boolean;
 }
+
+const textStyle = {
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  maxWidth: '290px',
+  padding: "10px"
+};
 
 const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const {fetchComments, comments} = usePublications();
+
+  //funcion al hacer clic en la card
+  const handleOpenCard = () => {
+    setOpen(true);
+    getCommentsId(petInfo.publication_id);
+  };
+
+  const getCommentsId = async(publicationId: number) => {
+    fetchComments(publicationId);
+  }
 
   const style = {
     position: 'absolute' as 'absolute',
@@ -64,15 +71,15 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
           color: theme.palette.primary.main,
         }}
       >
-        <CardActionArea onClick={handleOpen}>
+        <CardActionArea onClick={handleOpenCard}>
           {skeleton ? (
             <Skeleton width="100%" height="142px" />
           ) : (
             <CardMedia
               component="img"
               height="180px"
-              image={petInfo.img1_src}
-              alt={petInfo.img1_alt}
+              image={petInfo.pet_imgUrl}
+              alt={petInfo.pet_imgUrl}
             />
           )}
           <CardContent>
@@ -82,7 +89,7 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
                   <Skeleton width="100%" height="50px" />
                 ) : (
                   <Typography variant="h5" sx={{ fontWeight: "700" }}>
-                    {petInfo.strong_text}
+                    {petInfo.pet_name}
                   </Typography>
                 )}
               </Grid>
@@ -98,8 +105,8 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
                 {skeleton ? (
                   <Skeleton width="100%" height="50px" />
                 ) : (
-                  <Typography>
-                    {`${petInfo.height} cm de alto | ${petInfo.color} | ${petInfo.race}`}
+                  <Typography sx={textStyle}>
+                    {`${petInfo.pet_size} cm de alto | ${petInfo.pet_color} | ${petInfo.pet_raze}`}
                   </Typography>
                 )}
               </Grid>
@@ -108,7 +115,7 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
                   {skeleton ? (
                     <Skeleton variant="circular" width={40} height={40} />
                   ) : (
-                    <Avatar src={petInfo.img2_src} alt={petInfo.img2_alt} />
+                    <Avatar src={petInfo.user_imgUrl} alt={petInfo.user_imgUrl} />
                   )}
                 </Grid>
                 <Grid xs={8.5}>
@@ -116,8 +123,8 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
                     <Skeleton width="100%" height="50px" />
                   ) : (
                     <>
-                      <Typography variant="h6">{petInfo.span1_text}</Typography>
-                      <Typography>{petInfo.span2_text}</Typography>
+                      <Typography variant="h6">{petInfo.user_name}</Typography>
+                      <Typography>{petInfo.user_ubication}</Typography>
                     </>
                   )}
                 </Grid>
@@ -136,7 +143,7 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
       >
         <Box sx={style}>
           {/* aqui hay que modificar de donde vienen los datos para pasarle al modal...  */}
-          <ModalPublication comments={comments} />
+          <ModalPublication comments={comments} petInfo={petInfo}/>
         </Box>
       </Modal>
     </>

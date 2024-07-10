@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3002";
+const API_URL = process.env.REACT_APP_LOCAL_URL;
 
 interface Credentials {
   email: string;
@@ -8,18 +8,16 @@ interface Credentials {
 }
 
 //interfaz para el login
-interface LoginResponse {
+export interface LoginResponse { 
+  auth: boolean;
   token: string;
+  user_id: number;
 }
 
-const loginService = async (credentials: Credentials): Promise<string> => {
+const loginService = async (credentials: Credentials): Promise<LoginResponse> => {
   try {
     const response = await axios.post<LoginResponse>(`${API_URL}/user/loginUser`, credentials);
-    const { token } = response.data;
-
-    //guardo el token en sessionStorage
-    sessionStorage.setItem("token", token);
-    return token;
+    return response.data;
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     throw error;

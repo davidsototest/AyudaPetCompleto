@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import loginService from "../services/login/loginService";
+import loginService, { LoginResponse } from "../services/login/loginService";
 import { ToastiSuccess } from "../components/toasti/ToastiSuccess";
 import { ToastiError } from "../components/toasti/ToastiError";
 import singInService, {
@@ -14,6 +14,7 @@ import singInService, {
 
 interface AuthContextType {
   token: string | null;
+  user_id: number;
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   singIn: (data: CredentialsSingIn) => void;
@@ -27,12 +28,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [token, setToken] = useState<string | null>(
     sessionStorage.getItem("token") || null
   );
+  const [user_id, setUser_id] = useState<number | 0>(
+    Number(sessionStorage.getItem("user_id")) || 0
+  );
 
   const login = async (credentials: { email: string; password: string }) => {
     try {
-      const token = await loginService(credentials);
-      setToken(token);
-      sessionStorage.setItem("token", token);
+      const response = await loginService(credentials);
+      setToken(response.token);
+      setUser_id(response.user_id);
+      sessionStorage.setItem("token", response.token);
+      sessionStorage.setItem("user_id", response.user_id.toString());
       ToastiSuccess("... ¡Su inicio de sesión ha sido EXITOSO! ✅");
     } catch (error) {
       ToastiError("... ¡No se pudo iniciar la sesión, intenta nuevamente! 😊");
@@ -44,6 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const logout = () => {
     setToken(null);
     sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user_id");
     ToastiSuccess("... ¡Su cierre de sesión ha sido EXITOSO! ✅");
   };
 
@@ -68,7 +75,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, singIn }}>
+    <AuthContext.Provider value={{ token, login, logout, singIn, user_id }}>
       {children}
     </AuthContext.Provider>
   );

@@ -9,6 +9,7 @@ const app = express();
 const port = process.env.PORT || 3001; //process.env.PORT es para que al subirlo al serve en la nube tome el puesto que este entorno le asigne y no el 3001.
 const publicationsRoutes = require("./routes/publicationsRoutes");
 const userRoutes = require("./routes/userRoutes");
+const commentsRoutes = require("./routes/commentsRoutes");
 
 // Configuración de CORS
 const corsOptions = {
@@ -39,6 +40,7 @@ app.delete("/", (req, res) => {
 
 app.use("/user", userRoutes);
 app.use("/publications", publicationsRoutes);
+app.use("/publications/comments", commentsRoutes);
 
 app.listen(port, () => {
   console.log(`Servidor backend corriendo en:  http://localhost:${port}`);

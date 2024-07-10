@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:3002";
+const API_URL = process.env.REACT_APP_LOCAL_URL;
 
 export interface CredentialsSingIn {
   name: string;
@@ -19,15 +19,12 @@ interface SingInResponse {
 const singInService = async (credentials: CredentialsSingIn): Promise<string> => {
   try {
     const response = await axios.post<SingInResponse>(`${API_URL}/user`, credentials);
-    const { token } = response.data;
-
-    //guardo el token en sessionStorage
-    sessionStorage.setItem("token", token);
+    const { token } = response.data;;
     return token;
   } catch (error) {
     console.error("Error al iniciar sesión:", error);
     throw error;
-  }
+  };
 };
 
 export default singInService;

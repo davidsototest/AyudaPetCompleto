@@ -3,15 +3,18 @@ import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React from "react";
 import CardModalPublication from "../cards/CardModalPublication";
 import CommentsModal from "../others/CommentsModal";
-import { Comment, comments } from "../data/commentsTest";
+// import { Comment, comments } from "../data/commentsTest";
 import 'animate.css';
+import { Comment, Publication } from "../../context/PublicationsContext";
 
-interface Props {
+interface PropsModal {
   comments: Comment[];
+  petInfo: Publication;
 }
 
-const ModalPublication: React.FC<Props> = ({ comments }) => {
+const ModalPublication: React.FC<PropsModal> = ({ comments, petInfo }) => {
   const theme = useTheme();
+  console.log(petInfo)
 
   const style = {
     height: "1px",
@@ -48,9 +51,9 @@ const ModalPublication: React.FC<Props> = ({ comments }) => {
   };
 
   return (
-    <Grid container>
-      <Grid xs={12} textAlign="center" >
-        <Typography variant="h4" className="animate__animated animate__backInDown">Publicacion de Pep 12</Typography>
+    <Grid container sx={{color: theme.palette.primary.main}}>
+      <Grid xs={12} textAlign="center" sx={{color: theme.palette.primary.dark}}>
+        <Typography variant="h4" className="animate__animated animate__backInDown">Publicación de {petInfo.pet_name}</Typography>
         <Divider style={style} />
       </Grid>
       <Grid container marginTop={5} width="100%">
@@ -63,22 +66,16 @@ const ModalPublication: React.FC<Props> = ({ comments }) => {
           <Grid container spacing={2}>
             <Grid xs={6} >
               <Paper sx={paperOne} className="animate__animated animate__pulse">
-                <CardModalPublication />
+                <CardModalPublication petInfo={petInfo}/>
               </Paper>
             </Grid>
             <Grid xs={6}>
               <Paper sx={paperTwo}>
-                <CommentsModal comments={comments} />
+                <CommentsModal comments={comments} publicationId={petInfo.publication_id}/>
               </Paper>
             </Grid>
           </Grid>
         </Box>
-        {/* <Grid xs={6}>
-                    <CardModalPublication />
-                </Grid>
-                <Grid xs={6}>
-                    <CommentsModal comments={comments} />
-                </Grid> */}
       </Grid>
     </Grid>
   );

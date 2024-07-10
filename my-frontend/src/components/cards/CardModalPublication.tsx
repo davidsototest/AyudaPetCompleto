@@ -10,19 +10,20 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React from "react";
+import { Publication } from "../../context/PublicationsContext";
 
-interface Props {
-  // Define props here
+interface CardModalPublications {
+  petInfo: Publication;
+  skeleton?: boolean;
 }
 
-const CardModalPublication: React.FC<Props> = (Props) => {
+const CardModalPublication: React.FC<CardModalPublications> = ({petInfo, skeleton=false}) => {
   const theme = useTheme();
   const style = {
     height: "1px",
     marginTop: "10px",
     marginBottom: "10px",
   };
-  const skeleton = false;
 
   return (
     <Card
@@ -36,33 +37,30 @@ const CardModalPublication: React.FC<Props> = (Props) => {
       <CardMedia
         component="img"
         height="180px"
-        image="https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/publicaciones%2Fmascota%20(12).jpg?alt=media&token=75d2a020-d5e0-41c9-a978-24163ea0fcff"
-        alt="test"
+        image={petInfo.pet_imgUrl}
+        alt={petInfo.pet_imgUrl}
       />
       <CardContent>
         <Typography>Nombre de la Mascota:</Typography>
-        <Typography variant="h4">Goro</Typography>
+        <Typography variant="h4">{petInfo.pet_name}</Typography>
         <Divider style={style} />
         <Typography>Raza:</Typography>
-        <Typography variant="h5">Caniche</Typography>
+        <Typography variant="h5">{petInfo.pet_raze}</Typography>
         <Divider style={style} />
         <Grid container>
           <Grid xs={6}>
             <Typography>Estatus Aprox:</Typography>
-            <Typography variant="h5">44 cm</Typography>
+            <Typography variant="h5">{petInfo.pet_size} cm</Typography>
           </Grid>
           <Grid xs={6}>
             <Typography>Color:</Typography>
-            <Typography variant="h5">Negro</Typography>
+            <Typography variant="h5">{petInfo.pet_color}</Typography>
           </Grid>
         </Grid>
         <Divider style={style} />
         <Typography style={{ fontWeight: "700" }}>Descripcion:</Typography>
         <Typography>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto
-          mollitia, cum doloremque et veritatis velit eos qui, fuga provident
-          inventore repellendus temporibus explicabo tenetur consequatur iste
-          cumque aliquid facere earum.
+          {petInfo.publication_description}
         </Typography>
         <Divider style={style} />
         <Grid container width="100%">
@@ -71,8 +69,8 @@ const CardModalPublication: React.FC<Props> = (Props) => {
               <Skeleton variant="circular" width={40} height={40} />
             ) : (
               <Avatar
-                src="https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/avatars%2Favatar%20(4).jpg?alt=media&token=35b77e01-830a-4936-b20e-d049f7398398"
-                alt="test"
+                src={petInfo.user_imgUrl}
+                alt={petInfo.user_imgUrl}
               />
             )}
           </Grid>
@@ -81,8 +79,8 @@ const CardModalPublication: React.FC<Props> = (Props) => {
               <Skeleton width="100%" height="50px" />
             ) : (
               <>
-                <Typography variant="h6">Nombre del user</Typography>
-                <Typography>Rosario</Typography>
+                <Typography variant="h6">{petInfo.user_name}</Typography>
+                <Typography>{petInfo.user_ubication}</Typography>
               </>
             )}
           </Grid>

@@ -1,7 +1,7 @@
 // userService.ts
 import axios from "axios";
 
-const API_URL = "http://localhost:3002";
+const API_URL = process.env.REACT_APP_LOCAL_URL;
 
 // Obtener la cantidad de usuarios registrados, devuelve un numero entero
 export const getUserCount = async () => {

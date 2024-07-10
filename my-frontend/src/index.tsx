@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import "toastify-js/src/toastify.css";
 import { AuthProvider } from "./context/AuthContext";
 import { Router } from "react-router-dom";
+import { PublicationsProvider } from "./context/PublicationsContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -13,7 +14,9 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <AuthProvider>
-      <App />
+      <PublicationsProvider>
+        <App />
+      </PublicationsProvider>      
     </AuthProvider>
   </React.StrictMode>
 );

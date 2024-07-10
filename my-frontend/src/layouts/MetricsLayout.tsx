@@ -1,7 +1,7 @@
 import { Paper, Typography } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React, { useEffect, useState } from "react";
-import { getUserCount } from "../services/consultas/userService";
+import { getUserCount } from "../services/get/userService";
 
 interface Props {
   // Define props here

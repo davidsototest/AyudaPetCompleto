@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import { PetInfo } from "../components/data/petInfo";
 import CardSmall from "../components/cards/CardSmall";
 import { Pagination, Typography } from "@mui/material";
+import { Publication } from "../context/PublicationsContext";
 
 interface CardSmallLayoutProps {
-  petInfos: PetInfo[];
+  petInfos: Publication[];
   skeleton: boolean;
 }
 
@@ -20,7 +21,7 @@ const PublicationsCardSmall: React.FC<CardSmallLayoutProps> = ({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = petInfos.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(petInfos.length / itemsPerPage);
+  // const totalPages = Math.ceil(petInfos.length / itemsPerPage);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -32,7 +33,7 @@ const PublicationsCardSmall: React.FC<CardSmallLayoutProps> = ({
   return (
     <div>
       <Grid container spacing={5} justifyContent="center" margin={0}>
-        {currentItems.map((pet: PetInfo, index: number) => (
+        {currentItems.map((pet: Publication, index: number) => (
           <Grid key={index} justifyContent="center" display="flex" className="animate__animated animate__bounceIn">
             <CardSmall petInfo={pet} skeleton={skeleton} />
           </Grid>

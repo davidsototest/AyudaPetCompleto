@@ -153,7 +153,7 @@ const loginUser = (req, res) => {
       //genero el token
       const token = generateToken(result.id);
 
-      res.status(200).send({ auth: true, token: token });
+      res.status(200).send({ auth: true, token: token, user_id: result.id });
     }
   });
 };
