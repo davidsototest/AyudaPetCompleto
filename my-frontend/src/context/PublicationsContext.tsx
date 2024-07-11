@@ -77,6 +77,7 @@ export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
 
   //consultar todas las publicaciones
   const fetchPublications = async (): Promise<void> => {
+    console.log("context");
     try {
       const fetchedPublications = await getPublications();
       if (!fetchedPublications || fetchedPublications.length === 0) {

@@ -26,7 +26,7 @@ const PetsPublicationsPage: React.FC<Props> = (Props) => {
 
   // useEffect que consulta las publicaciones al montar el componente por primera vez
   useEffect(() => {
-    if (publications === null) {
+    if (publications.length === 0 ) {
       const getPublications = async () => {
         setIsLoading(true);
         try {
@@ -44,7 +44,7 @@ const PetsPublicationsPage: React.FC<Props> = (Props) => {
     } else {
       setPublicationsData(publications);
     }
-  }, [fetchPublications, publications]);
+  }, []);
 
   return (
     <Grid container width={maxWidth} margin={"auto"}>

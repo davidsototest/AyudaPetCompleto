@@ -30,7 +30,7 @@ const CommentsModal: React.FC<Props> = ({ comments, publicationId }) => {
   const [enableComments, setEnableComments] = useState(false);
   const navigate = useNavigate();
   const { token, user_id } = useAuth();
-  const { sendComment } = usePublications();
+  const { sendComment, fetchComments } = usePublications();
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -44,7 +44,6 @@ const CommentsModal: React.FC<Props> = ({ comments, publicationId }) => {
   };
 
   const handleSendComment = async () => {
-    console.log("asdda")
     const now = new Date(); // Fecha y hora actuales
     const isoString = now.toISOString(); // "2024-07-09T12:34:56.789Z"
     const dateOnly = isoString.split("T")[0]; // "2024-07-09"
@@ -54,9 +53,11 @@ const CommentsModal: React.FC<Props> = ({ comments, publicationId }) => {
       comment: comment,
       date: dateOnly,
     };
-    console.log(data);
+
     try {
       await sendComment(publicationId, data);
+      await fetchComments(publicationId);
+      setComment("");
     } catch (error) {
       console.log("error al enviar el mensaje al context: " + error);
     }
@@ -81,9 +82,9 @@ const CommentsModal: React.FC<Props> = ({ comments, publicationId }) => {
     }
   }, [token]);
 
-  // useEffect(() => {
-  //   setCommentsList(comments);
-  // }, [comments]);
+  useEffect(() => {
+    setCommentsList(comments);
+  }, [comments]);
 
   const styleTextField = {
     "& .MuiOutlinedInput-root": {

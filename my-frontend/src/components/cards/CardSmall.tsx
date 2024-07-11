@@ -143,7 +143,7 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
       >
         <Box sx={style}>
           {/* aqui hay que modificar de donde vienen los datos para pasarle al modal...  */}
-          <ModalPublication comments={comments} petInfo={petInfo}/>
+          <ModalPublication comments={comments} petInfo={petInfo} handleClose={handleClose}/>
         </Box>
       </Modal>
     </>
