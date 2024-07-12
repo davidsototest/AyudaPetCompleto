@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { ToastiSuccess } from "../components/toasti/ToastiSuccess";
 import { ToastiError } from "../components/toasti/ToastiError";
-import { getPublications } from "../services/get/publicationService";
+import { getPublications, getPublicationsUserId } from "../services/get/publicationService";
 import { getComments } from "../services/get/commentsService";
 import { sendComments } from "../services/send/postCommentService";
 import { useAuth } from "./AuthContext";
@@ -51,12 +51,29 @@ export interface Publication {
   pet_imgUrl: string;
 }
 
+//interfaz de publicaciones por usuario
+export interface PublicationUserId {
+  id: number;
+  user_id: number;
+  pet_id: number;
+  description: string;
+  status: number;
+  pet_name: string;
+  pet_raze: string;
+  pet_age: number;
+  pet_color: string;
+  pet_size: string;
+  pet_imgUrl: string;
+}
+
 interface PublicationsContextType {
   fetchPublications: () => Promise<void>;
   publications: Publication[];
   addPublication: (publication: Publication) => void;
   removePublication: (id: string) => void;
   fetchComments: (publicationId: number) => Promise<void>;
+  getPublicationUserId: (user_id: number) => Promise<void>;
+  publicationsUserId: PublicationUserId[];
   comments: Comment[];
   sendComment: (publicationId: number, sendComment: SendComment) => Promise<boolean>;
 }
@@ -65,19 +82,22 @@ const PublicationsContext = createContext<PublicationsContextType | undefined>(
   undefined
 );
 
-export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
+export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({ 
   children,
 }) => {
   const [publications, setPublications] = useState<Publication[]>(() => {
     const storedPublications = sessionStorage.getItem("publications");
     return storedPublications ? JSON.parse(storedPublications) : [];
   });
+  const [publicationsUserId, setPublicationsUserId] = useState<PublicationUserId[]>(() => {
+    const storedPublicationsUserId = sessionStorage.getItem("publicationsUserId");
+    return storedPublicationsUserId ? JSON.parse(storedPublicationsUserId) : [];
+  });
   const [comments, setComments] = useState<Comment[]>([]);
   const {token} = useAuth();
 
   //consultar todas las publicaciones
   const fetchPublications = async (): Promise<void> => {
-    console.log("context");
     try {
       const fetchedPublications = await getPublications();
       if (!fetchedPublications || fetchedPublications.length === 0) {
@@ -94,6 +114,20 @@ export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
       throw error;
     }
   };
+
+  //buscar todas las publicaciones de un user especifico
+  const getPublicationUserId = async (user_id: number): Promise<void> => {
+    try {
+      const publicationsUser = await getPublicationsUserId(user_id, token as string);
+      setPublicationsUserId(publicationsUser);
+      sessionStorage.setItem(
+        "publicationsUserId",
+        JSON.stringify(publicationsUser)
+      );
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const addPublication = (publication: Publication) => {
     // try {
@@ -158,6 +192,8 @@ export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
     <PublicationsContext.Provider
       value={{
         publications,
+        getPublicationUserId,
+        publicationsUserId,
         addPublication,
         removePublication,
         fetchPublications,

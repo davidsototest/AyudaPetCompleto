@@ -1,6 +1,10 @@
 const db = require("../config/dbConfig");
 const publicationMiddleware = require("../middleware/loggerMiddleware");
 const publicationModel = require("../models/publicationModel");
+const moment = require("moment");
+
+// Validar formato de la fecha usando moment.js
+const isValidDate = (date) => moment(date, "YYYY-MM-DD", true).isValid();
 
 //--------------------TRAER TODAS LAS PUBLICACIONES-----------------------
 const getAllPublications = (req, res) => {
@@ -28,83 +32,52 @@ JOIN
 WHERE 
     p.status IN (1, 2);`;
   db.query(sql, (err, results) => {
-    // console.log(results)
     if (err) {
-      return res
-        .status(500)
-        .send({ message: "Error en el servidor al procesar la solicitud.", error: err });
+      return res.status(500).send({
+        message: "Error en el servidor al procesar la solicitud.",
+        error: err,
+      });
     }
     res.status(200).json(results);
   });
 };
 
-
-//---------------------TRAER PUBLICACIONES POR ID---------------------------
-const getPublicationById = (req, res) => {
-  const { id } = req.params;
-  publicationModel.getPublicationById(id, (err, results) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else if (results.length === 0) {
-      res.status(404).json({ message: "Usuario no encontrado" });
-    } else {
-      const result = {
-        id: results[0].id,
-        status: results[0].status,
-        date: results[0].date,
-        pet: {
-          name: results[0].name_pet,
-          raze: results[0].raze,
-          age: results[0].age,
-          size: results[0].size,
-          color: results[0].color,
-          description: results[0].description,
-          imgUrl: results[0].imgUrl_pet,
-        },
-        user: {
-          name: results[0].name,
-          ubication: results[0].ubication,
-          phone: results[0].phone,
-          email: results[0].email,
-          status: results[0].status_user,
-          imgUrl: results[0].imgUrl_user,
-        },
-        comments: [],
-      };
-      if (!results[0].comment) return res.json(result);
-      for (let i = 0; i < results.length; i++) {
-        const comment = {
-          id: results[i].id_com,
-          comment: results[i].comment,
-          date: results[i].date_com,
-          status: results[i].status_com,
-          user_name: results[i].user_com.name,
-          user_ubication: results[i].user_com.ubication,
-          user_phone: results[i].user_com.phone,
-          user_email: results[i].user_com.email,
-          user_status: results[i].user_com.status,
-          user_imgUrl: results[i].user_com.imgUrl,
-        };
-
-        result.comments.push(comment);
-      }
-      res.json(result);
-    }
-  });
-};
-
-
 //-------------------------------- CREAR PUBLICACION-----------------------------------------------
 const createPublication = (req, res) => {
-  const { status, date, description, user_id, pet_id } = req.body;
+  const {
+    name_pet,
+    raze_pet,
+    age_pet,
+    color_pet,
+    size_pet,
+    imgUrl_pet,
+    user_id,
+    date,
+    description,
+  } = req.body;
 
   // Valida que todos los campos estén presentes
-  if (!status || !date || !description || !user_id || !pet_id) {
+  if (
+    !name_pet ||
+    !raze_pet ||
+    !age_pet ||
+    !color_pet ||
+    !size_pet ||
+    !imgUrl_pet ||
+    !date ||
+    !description ||
+    !user_id
+  ) {
     return res.status(400).json({ message: "Falta dato requerido" });
   }
 
+  // Validar que la fecha tenga el formato correcto
+  if (!isValidDate(date)) {
+    return res.status(400).json({ message: "Formato de fecha inválido" });
+  }
+
   // Valida que el usuario exista
-  const sqlUser = "SELECT id FROM user WHERE id = ?";
+  const sqlUser = "SELECT id FROM User WHERE id = ?";
   db.query(sqlUser, [user_id], (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Error en la base de datos" });
@@ -113,41 +86,76 @@ const createPublication = (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // El usuario existe, procede a insertar la publicación
-    const sql =
-      "INSERT INTO publication (user_id, pet_id, status, date, description) VALUES (?, ?, ?, ?, ?)";
+    //CREAR el pet en la database
+    const sqlPet =
+      "INSERT INTO Pet (Name, Raze, Age, Color, Size, ImgUrl) VALUES (?, ?, ?, ?, ?, ?)";
     db.query(
-      sql,
-      [user_id, pet_id, status, date, description],
+      sqlPet,
+      [name_pet, raze_pet, age_pet, color_pet, size_pet, imgUrl_pet],
       (err, result) => {
         if (err) {
           return res.status(500).json({
-            message: "Error al crear la publicación",
+            message: "Error al crear el registro en PET",
             error: err.message,
           });
         }
-        res.status(201).json({
-          message: "Publicación creada exitosamente",
-          publicationId: result.insertId,
-        });
+        const pet_id = parseInt(result.insertId, 10);
+
+        // Creada la mascota, procede a insertar la publicación
+        const sql =
+          "INSERT INTO Publications (user_id, pet_id, status, date, description) VALUES (?, ?, ?, ?, ?)";
+        db.query(
+          sql,
+          [user_id, pet_id, 1, date, description],
+          (err, result) => {
+            if (err) {
+              return res.status(500).json({
+                message: "Error al crear la publicación",
+                error: err.message,
+              });
+            }
+            res.status(200).json({
+              message: "Publicación creada exitosamente",
+            });
+          }
+        );
       }
     );
   });
 };
 
-
 // ------------------------------------- MODIFICAR PUBLICACION ID --------------------------------------------
 const updatePublication = (req, res) => {
   const publicationId = req.params.id;
-  const { status, date, description, user_id, pet_id } = req.body;
+  const {
+    name_pet,
+    raze_pet,
+    age_pet,
+    color_pet,
+    size_pet,
+    imgUrl_pet,
+    description,
+    user_id,
+    pet_id,
+  } = req.body;
 
   // Valida que estén todos los campos presentes
-  if (!status || !date || !description || !user_id || !pet_id) {
+  if (
+    !name_pet ||
+    !raze_pet ||
+    !age_pet ||
+    !color_pet ||
+    !size_pet ||
+    !imgUrl_pet ||
+    !description ||
+    !user_id ||
+    !pet_id
+  ) {
     return res.status(400).json({ message: "Falta dato requerido" });
   }
 
   // Valida que la publicación exista
-  const sqlPublication = "SELECT id FROM publication WHERE id = ?";
+  const sqlPublication = "SELECT id FROM Publications WHERE id = ?";
   db.query(sqlPublication, [publicationId], (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Error en la base de datos" });
@@ -156,98 +164,73 @@ const updatePublication = (req, res) => {
       return res.status(404).json({ message: "Publicación no encontrada" });
     }
 
-    // Si la publicación existe, procede a actualizarla
-    const sqlUpdate =
-      "UPDATE publication SET status = ?, date = ?, description = ?, user_id = ?, pet_id = ? WHERE id = ?";
-    db.query(
-      sqlUpdate,
-      [status, date, description, user_id, pet_id, publicationId],
-      (err, result) => {
-        if (err) {
-          return res.status(500).json({
-            message: "Error al actualizar la publicación",
-            error: err.message,
-          });
-        }
-        res.json({ message: "Publicación modificada exitosamente" });
-      }
-    );
-  });
-};
-
-// --------------------------------- MODIFICAR COMENTARIO POR ID --------------------------------------
-const updateComment = (req, res) => {
-  const { publicationId, commentId } = req.params;
-  const { content } = req.body;
-
-  // Validar que el usuario esté autenticado
-  if (!req.isAuthenticated || !req.isAuthenticated()) {
-    return res.status(401).json({ message: "Usuario no autenticado." });
-  }
-
-  // Validar que todos los datos requeridos están presentes
-  if (!content) {
-    return res.status(400).json({ message: "Dato faltante." });
-  }
-
-  // Validar que la publicación existe
-  const sqlPublication = "SELECT id FROM publication WHERE id = ?";
-  db.query(sqlPublication, [publicationId], (err, publicationResults) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ message: "Error en la base de datos", error: err.message });
-    }
-    if (publicationResults.length === 0) {
-      return res.status(404).json({ message: "Publicación no encontrada." });
-    }
-
-    // Validar que el comentario existe
-    const sqlComment =
-      "SELECT id FROM comments WHERE id = ? AND publicationId = ?";
-    db.query(sqlComment, [commentId, publicationId], (err, commentResults) => {
+    // Validar que la mascota exista
+    const sqlPet = "SELECT id FROM Pet WHERE id = ?";
+    db.query(sqlPet, [pet_id], (err, results) => {
       if (err) {
-        return res
-          .status(500)
-          .json({ message: "Error en la base de datos", error: err.message });
+        return res.status(500).json({ message: "Error en la base de datos" });
       }
-      if (commentResults.length === 0) {
-        return res.status(404).json({ message: "Comentario no encontrado." });
+      if (results.length === 0) {
+        return res.status(404).json({ message: "Pet no encontrada" });
       }
 
-      // Actualizar datos del comentario
-      const sqlUpdate = "UPDATE comments SET content = ? WHERE id = ?";
-      db.query(sqlUpdate, [content, commentId], (err, results) => {
-        if (err) {
-          return res.status(500).json({
-            message: "Error al actualizar el comentario",
-            error: err.message,
-          });
+      // Si la publicación y mascota existen, procede a actualizar la mascota
+      const sqlUpdatePet =
+        "UPDATE Pet SET Name = ?, Raze = ?, Age = ?, Color = ?, Size = ?, ImgUrl = ? WHERE id = ?";
+      db.query(
+        sqlUpdatePet,
+        [name_pet, raze_pet, age_pet, color_pet, size_pet, imgUrl_pet, pet_id],
+        (err, result) => {
+          if (err) {
+            return res.status(500).json({
+              message: "Error al actualizar la mascota",
+              error: err.message,
+            });
+          }
+
+          // Actualiza la publicación
+          const sqlUpdatePublication =
+            "UPDATE Publications SET user_id = ?, pet_id = ?, description = ? WHERE id = ?";
+          db.query(
+            sqlUpdatePublication,
+            [user_id, pet_id, description, publicationId],
+            (err, result) => {
+              if (err) {
+                return res.status(500).json({
+                  message: "Error al actualizar la publicación",
+                  error: err.message,
+                });
+              }
+              res.status(200).json({
+                message: "Publicación actualizada exitosamente",
+              });
+            }
+          );
         }
-        res.json({ message: "Comentario modificado exitosamente." });
-      });
+      );
     });
   });
 };
-
 
 //--------------------DELETE PUBLICACION--------------------------
 const deletePublication = (req, res) => {
   const { id } = req.params;
 
   // Validar que la publicación existe
-  const sql = "SELECT * FROM publications WHERE id = ?";
-  db.query(sql, [id], (err, result) => {
+  const sqlPublicationsId = "SELECT * FROM Publications WHERE id = ?";
+  db.query(sqlPublicationsId, [id], (err, result) => {
     if (err) {
       return res
         .status(500)
         .json({ message: "Error en la base de datos", error: err.message });
     }
-    if (result.length === 0 || result[0].status == 0)
+
+    if (result.length == 0 || result[0].status == 0) {
       return res.status(404).send({ message: "La publicación no existe." });
+    }
 
     // "Eliminar" la publicacion
-    const sqlUpdate = "UPDATE publications SET status = 0 WHERE id = ?;";
+    const sqlUpdate = "UPDATE Publications SET status = 0 WHERE id = ?;";
     db.query(sqlUpdate, [id], (err, result) => {
       if (err) {
         return res.status(500).json({
@@ -255,56 +238,15 @@ const deletePublication = (req, res) => {
           error: err.message,
         });
       }
-      res.status(204).send("Publicación eliminada exitosamente.");
+      res.status(200).json({ message: "Publicación eliminada exitosamente." });
     });
   });
 };
 
-
-//-------------------DELETE COMMENT--------------------------------------------------------------
-const deleteComment = (req, res) => {
-  const { publicationId, id } = req.params;
-
-  //Validar Existencia de la publicación
-  const sqlPub = "SELECT * FROM publications WHERE id = ?";
-  db.query(sqlPub, [publicationId], (err, result) => {
-    if (err) {
-      return res
-        .status(500)
-        .json({ message: "Error en la base de datos", error: err.message });
-    }
-    if (result.length === 0 || result[0].status == 0)
-      return res.status(404).send({ message: "Publicación no encontrada." });
-
-    //Validar la existencia del comentario
-    const sqlCom = "SELECT * FROM comments WHERE id = ?";
-    db.query(sqlCom, [id], (err, result) => {
-      if (err) {
-        return res
-          .status(500)
-          .json({ message: "Error en la base de datos", error: err.message });
-      }
-      if (result.length === 0 || result[0].status == 0)
-        return res.status(404).send({ message: "Comentario no encontrado." });
-
-      //"Eliminar" el comentario
-      const sqlUpdate = "UPDATE comments SET status = 0 WHERE id = ?;";
-      db.query(sqlUpdate, [id], (err, result) => {
-        if (err) {
-          return res.status(500).json({
-            message: "Error al eliminar el comentario",
-            error: err.message,
-          });
-        }
-        res.status(204).send("Publicación eliminada exitosamente.");
-      });
-    });
-  });
-};
-
-// consultar la cantidad de publicaciones activas
+//-------COUNT PUBLICACIONES --------------------
 const getPublicationsCount = (req, res) => {
   console.log("aqui");
+
   publicationModel.getPublicationCount((err, count) => {
     if (err) {
       return res
@@ -315,14 +257,62 @@ const getPublicationsCount = (req, res) => {
   });
 };
 
+// ----------- PUBLICATIONS DE UN USUARIO ---------------
+const getPublicationsForUser = (req, res) => {
+  const { user_id } = req.body;
+
+  // Validar que el user existe
+  const sqlUserId = "SELECT * FROM User WHERE id = ?";
+  db.query(sqlUserId, [user_id], (err, result) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Error en la base de datos al consultar usuario",
+        error: err.message,
+      });
+    }
+    if (result.length == 0 || result[0].status == 0) {
+      return res.status(404).send({ message: "El usuario no existe." });
+    }
+
+    // Envar todas las publicaciones de ese usuario
+    const sqlPublicationsUserId = `
+  SELECT 
+    p.id,
+    p.user_id,
+    p.pet_id,
+    p.description,
+    p.status,
+    pet.Name AS pet_name,
+    pet.Raze AS pet_raze,
+    pet.Age AS pet_age,
+    pet.Color AS pet_color,
+    pet.Size AS pet_size,
+    pet.ImgUrl AS pet_imgUrl
+  FROM 
+    Publications p
+  JOIN 
+    Pet pet ON p.pet_id = pet.id
+  WHERE 
+    p.user_id = ?
+`;
+    db.query(sqlPublicationsUserId, [user_id], (err, result) => {
+      if (err) {
+        return res.status(500).json({
+          message: "Error en base de datos",
+          error: err.message,
+        });
+      }
+      res.status(200).json(result);
+    });
+  });
+};
+
 //-------------------EXPORTS--------------------------------------
 module.exports = {
   getAllPublications,
-  getPublicationById,
   createPublication,
   updatePublication,
-  updateComment,
   deletePublication,
-  deleteComment,
   getPublicationsCount,
+  getPublicationsForUser,
 };

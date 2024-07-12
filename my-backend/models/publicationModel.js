@@ -31,7 +31,7 @@ const getPublicationById= (publicationId, callback) => {
 
 //Obtengo la cantidad de publicaciones en la tabla Publications
 const getPublicationCount = (callback) => {
-    db.query('SELECT COUNT(*) AS count FROM Publications', (err, results) => {
+    db.query('SELECT COUNT(*) AS count FROM Publications WHERE status != 0', (err, results) => {
         if (err) {
             return callback(err);
         }

@@ -1,6 +1,7 @@
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React from "react";
 import InContrucction from "../components/others/InContruction";
+import PublicationsUser from "../components/profile/PublicationsUser";
 
 interface Props {
   // Define props here
@@ -13,7 +14,7 @@ const ProfileLayout: React.FC<Props> = (Props) => {
   return (
     <Grid container>
       <Grid xs={12} md={6} padding={5} justifyContent="center" display="flex">
-        <InContrucction/>
+        <PublicationsUser />
       </Grid>
       <Grid
         xs={12}

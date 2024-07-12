@@ -10,7 +10,6 @@ export const sendComments = async (
   data: SendComment,
   token: string,
 ): Promise<boolean> => {
-  console.log("id: " + publicationId, "data: " + data, "token: " + token);
   try {
     const response = await axios.post(
       `${API_URL}/publications/comments/${publicationId}`,

@@ -15,6 +15,7 @@ import singInService, {
 interface AuthContextType {
   token: string | null;
   user_id: number;
+  user_name: string | "";
   login: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   singIn: (data: CredentialsSingIn) => void;
@@ -31,12 +32,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const [user_id, setUser_id] = useState<number | 0>(
     Number(sessionStorage.getItem("user_id")) || 0
   );
+  const [user_name, setUser_name] = useState<string | "">(
+    sessionStorage.getItem("user_name") || ""
+  );
 
+  //iniciar sesion
   const login = async (credentials: { email: string; password: string }) => {
     try {
       const response = await loginService(credentials);
       setToken(response.token);
       setUser_id(response.user_id);
+      setUser_name(response.user_name);
+      sessionStorage.setItem("user_name", response.user_name);
       sessionStorage.setItem("token", response.token);
       sessionStorage.setItem("user_id", response.user_id.toString());
       ToastiSuccess("... ¡Su inicio de sesión ha sido EXITOSO! ✅");
@@ -75,7 +82,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   return (
-    <AuthContext.Provider value={{ token, login, logout, singIn, user_id }}>
+    <AuthContext.Provider value={{ token, login, logout, singIn, user_id, user_name }}>
       {children}
     </AuthContext.Provider>
   );

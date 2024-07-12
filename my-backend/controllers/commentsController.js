@@ -118,9 +118,6 @@ const getCommentPublication = (req, res) => {
     if (results.length === 0) {
       return res.status(404).json({ message: "Publicación no encontrada" });
     }
-    // if(results[0].status == 3 || results[0].status == 2){
-    //     return res.status(404).json({ message: "Publicación eliminadao mascota encontrada, NO puede agregar mas comentarios" });
-    // };
   });
 
   // busco todos los comentario de esa publicacion

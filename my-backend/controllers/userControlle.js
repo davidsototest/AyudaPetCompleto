@@ -85,33 +85,36 @@ const createUser = async (req, res) => {
 // --------------------------------- MODIFICAR USUARIO POR ID ------PENDIENTE------------------------
 const updateUser = (req, res) => {
   const userId = req.params.id;
-  const { Name, Ubication, Phone, Password, imgUrl } = req.body;
+  const { name, ubication, phone, imgUrl } = req.body;
 
   //valido los campos
-  if (!Name || !Ubication || !Phone || !Password || !imgUrl) {
+  if (!name || !ubication || !phone || !imgUrl) {
     return res.status(400).json({ message: "Faltan datos en la peticion" });
   }
+
   //validar el usuario
-  const sqlUser = "SELECT id FROM user WHERE id = ?";
+  const sqlUser = "SELECT id FROM User WHERE id = ?";
   db.query(sqlUser, [userId], (err, results) => {
     if (err) {
       return res.status(500).json({ message: "Error en la base de datos" });
     }
     if (results.length === 0) {
       return res.status(404).json({ message: "Usuario no encontrado" });
-    }
+    };
+
     //validar el formato del numero
-    if (Phone.length < 10) {
+    if (phone.length < 10) {
       return res.status(400).json({
         message: "El numero de telefono debe tener al menos 10 digitos",
       });
-    }
+    };
+
     //actualizar datos del usuario
     const sqlUpdate =
-      "UPDATE user SET Name = ?, Ubication = ?, Phone = ?, Password = ?, imgUrl = ? WHERE id = ?";
+      "UPDATE User SET Name = ?, Ubication = ?, Phone = ?, imgUrl = ? WHERE id = ?";
     db.query(
       sqlUpdate,
-      [Name, Ubication, Phone, Password, imgUrl, userId],
+      [name, ubication, phone, imgUrl, userId],
       (err, results) => {
         if (err) {
           return res.status(500).json({
@@ -119,7 +122,7 @@ const updateUser = (req, res) => {
             error: err.message,
           });
         }
-        res.json({ message: "Usuario modificado exitosamente!!" });
+        res.status(200).json({ message: "Usuario modificado exitosamente!!" });
       }
     );
   });
@@ -153,25 +156,25 @@ const loginUser = (req, res) => {
       //genero el token
       const token = generateToken(result.id);
 
-      res.status(200).send({ auth: true, token: token, user_id: result.id });
+      res.status(200).send({ auth: true, token: token, user_id: result.id, user_name: result.name });
     }
   });
 };
 
 //----------------------------DELETE USER--------------------------------------
 const deleteUser = async (req, res) => {
-  const { id } = req.body;
+  const userId = req.params.id;
   let token = req.headers["authorization"];
 
   // Eliminar el prefijo "Bearer" si está presente
   if (token.startsWith("Bearer ")) {
     token = token.slice(7, token.length); // "Bearer " tiene 7 caracteres
-  }
+  };
 
   //validar que enviaron el id y token
-  if (!id || !token) {
+  if (!userId || !token) {
     return res.status(400).json({ message: "Faltan datos requeridos" });
-  }
+  };
 
   // Validar que el token sea válido
   try {
@@ -186,7 +189,7 @@ const deleteUser = async (req, res) => {
 
   // Validar que el usuario existe
   const sql = "SELECT * FROM User WHERE id = ?";
-  db.query(sql, [id], (err, result) => {
+  db.query(sql, [userId], (err, result) => {
     if (err) {
       return res
         .status(500)
@@ -197,14 +200,14 @@ const deleteUser = async (req, res) => {
 
     // "Eliminar" el usuario
     const sqlUpdate = "UPDATE User SET status = 0 WHERE id = ?;";
-    db.query(sqlUpdate, [id], (err, result) => {
+    db.query(sqlUpdate, [userId], (err, result) => {
       if (err) {
         return res.status(500).json({
           message: "Error al eliminar el usuario",
           error: err.message,
         });
       }
-      res.status(202).json({ message: "Usuario eliminado exitosamente." });
+      res.status(200).json({ message: "Usuario eliminado exitosamente!!" });
     });
   });
 };

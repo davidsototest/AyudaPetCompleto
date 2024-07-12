@@ -12,6 +12,7 @@ export interface LoginResponse {
   auth: boolean;
   token: string;
   user_id: number;
+  user_name: string;
 }
 
 const loginService = async (credentials: Credentials): Promise<LoginResponse> => {
