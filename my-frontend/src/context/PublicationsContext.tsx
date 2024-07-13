@@ -11,7 +11,20 @@ import { getPublications, getPublicationsUserId } from "../services/get/publicat
 import { getComments } from "../services/get/commentsService";
 import { sendComments } from "../services/send/postCommentService";
 import { useAuth } from "./AuthContext";
-// import { comments } from '../components/data/commentsTest';
+
+
+//interfaz de agregar una publicacion nueva
+export interface PublicationAdd {
+  name_pet: string;
+  raze_pet: string;
+  age_pet: number;
+  color_pet: string;
+  size_pet: number;
+  imgUrl_pet: string;
+  user_id: number;
+  date: string;
+  description: string;
+};
 
 //interfaz para guardar comentarios
 export interface SendComment {
@@ -19,7 +32,7 @@ export interface SendComment {
   comment: string;
   date: string; // Fecha del comentario en formato ISO 8601 (e.g., "2001-12-30")
   token?: string;
-}
+};
 
 //interfaz de comentarios
 export interface Comment {
@@ -49,31 +62,16 @@ export interface Publication {
   pet_color: string;
   pet_size: string;
   pet_imgUrl: string;
-}
-
-//interfaz de publicaciones por usuario
-export interface PublicationUserId {
-  id: number;
-  user_id: number;
-  pet_id: number;
-  description: string;
-  status: number;
-  pet_name: string;
-  pet_raze: string;
-  pet_age: number;
-  pet_color: string;
-  pet_size: string;
-  pet_imgUrl: string;
-}
+};
 
 interface PublicationsContextType {
   fetchPublications: () => Promise<void>;
   publications: Publication[];
-  addPublication: (publication: Publication) => void;
+  addPublication: (publication: PublicationAdd) => void;
   removePublication: (id: string) => void;
   fetchComments: (publicationId: number) => Promise<void>;
   getPublicationUserId: (user_id: number) => Promise<void>;
-  publicationsUserId: PublicationUserId[];
+  publicationsUserId: Publication[];
   comments: Comment[];
   sendComment: (publicationId: number, sendComment: SendComment) => Promise<boolean>;
 }
@@ -89,7 +87,7 @@ export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
     const storedPublications = sessionStorage.getItem("publications");
     return storedPublications ? JSON.parse(storedPublications) : [];
   });
-  const [publicationsUserId, setPublicationsUserId] = useState<PublicationUserId[]>(() => {
+  const [publicationsUserId, setPublicationsUserId] = useState<Publication[]>(() => {
     const storedPublicationsUserId = sessionStorage.getItem("publicationsUserId");
     return storedPublicationsUserId ? JSON.parse(storedPublicationsUserId) : [];
   });
@@ -129,7 +127,7 @@ export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
     }
   }
 
-  const addPublication = (publication: Publication) => {
+  const addPublication = (publication: PublicationAdd) => {
     // try {
     //   setPublications((prevPublications) => [...prevPublications, publication]);
     //   ToastiSuccess("¡Publicación añadida con éxito! ✅");

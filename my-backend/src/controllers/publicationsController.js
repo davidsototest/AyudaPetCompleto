@@ -1,10 +1,10 @@
 const db = require("../config/dbConfig");
 const publicationMiddleware = require("../middleware/loggerMiddleware");
 const publicationModel = require("../models/publicationModel");
-const moment = require("moment");
+// const moment = require('moment');
 
 // Validar formato de la fecha usando moment.js
-const isValidDate = (date) => moment(date, "YYYY-MM-DD", true).isValid();
+// const isValidDate = (date) => moment(date, "YYYY-MM-DD", true).isValid();
 
 //--------------------TRAER TODAS LAS PUBLICACIONES-----------------------
 const getAllPublications = (req, res) => {
@@ -72,9 +72,9 @@ const createPublication = (req, res) => {
   }
 
   // Validar que la fecha tenga el formato correcto
-  if (!isValidDate(date)) {
-    return res.status(400).json({ message: "Formato de fecha inválido" });
-  }
+  // if (!isValidDate(date)) {
+  //   return res.status(400).json({ message: "Formato de fecha inválido" });
+  // }
 
   // Valida que el usuario exista
   const sqlUser = "SELECT id FROM User WHERE id = ?";
@@ -276,25 +276,30 @@ const getPublicationsForUser = (req, res) => {
 
     // Envar todas las publicaciones de ese usuario
     const sqlPublicationsUserId = `
-  SELECT 
-    p.id,
-    p.user_id,
-    p.pet_id,
-    p.description,
-    p.status,
-    pet.Name AS pet_name,
-    pet.Raze AS pet_raze,
-    pet.Age AS pet_age,
-    pet.Color AS pet_color,
-    pet.Size AS pet_size,
-    pet.ImgUrl AS pet_imgUrl
-  FROM 
-    Publications p
-  JOIN 
-    Pet pet ON p.pet_id = pet.id
-  WHERE 
-    p.user_id = ?
-`;
+    SELECT 
+        p.id AS publication_id,
+        p.date AS publication_date,
+        p.description AS publication_description,
+        p.status AS publication_status,
+        u.name AS user_name,
+        u.id AS user_id,
+        u.ubication AS user_ubication,
+        u.imgUrl AS user_imgUrl,
+        pt.name AS pet_name,
+        pt.raze AS pet_raze,
+        pt.age AS pet_age,
+        pt.color AS pet_color,
+        pt.size AS pet_size,
+        pt.imgUrl AS pet_imgUrl
+    FROM 
+        bwarjdqn35lidbfwqtyy.Publications p
+    JOIN 
+        bwarjdqn35lidbfwqtyy.User u ON p.user_id = u.id
+    JOIN 
+        bwarjdqn35lidbfwqtyy.Pet pt ON p.pet_id = pt.id
+    WHERE 
+        p.status IN (1, 2) 
+        AND p.user_id = ?;`;
     db.query(sqlPublicationsUserId, [user_id], (err, result) => {
       if (err) {
         return res.status(500).json({

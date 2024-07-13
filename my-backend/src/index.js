@@ -1,15 +1,17 @@
-// index.js
+
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 const db = require("./config/dbConfig");
+ 
+
 
 const app = express();
 const port = process.env.PORT || 3001; //process.env.PORT es para que al subirlo al serve en la nube tome el puesto que este entorno le asigne y no el 3001.
-const publicationsRoutes = require("./routes/publicationsRoutes");
-const userRoutes = require("./routes/userRoutes");
-const commentsRoutes = require("./routes/commentsRoutes");
+const commentsRoutes = require("../src/routes/commentsRoutes.js");
+const publicationsRoutes = require("../src/routes/publicationsRoutes.js");
+const userRoutes = require("../src/routes/userRoutes.js");
 
 // Configuración de CORS
 const corsOptions = {
@@ -21,22 +23,6 @@ const corsOptions = {
 // Middleware para manejar CORS
 app.use(cors(corsOptions));
 app.use(express.json());
-
-app.get("/", (req, res) => {
-  res.send("GET equipo 12");
-});
-
-app.put("/", (req, res) => {
-  res.send("PUT equipo 12");
-});
-
-app.post("/", (req, res) => {
-  res.send("POST equipo 12");
-});
-
-app.delete("/", (req, res) => {
-  res.send("DELETE equipo 12");
-});
 
 app.use("/user", userRoutes);
 app.use("/publications", publicationsRoutes);

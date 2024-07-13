@@ -1,15 +1,25 @@
 require('dotenv').config();
+const functions = require('firebase-functions'); 
 const mysql = require('mysql2');
 
 //conexion a la base de datos. 
 //todos los datos sensibles estan en la variable de entorno .env
 //para que no se suba al repo y solo nosotros tengamos los datos
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
+    //locales
+    // host: process.env.DB_HOST,
+    // user: process.env.DB_USER,
+    // password: process.env.DB_PASSWORD,
+    // database: process.env.DB_NAME
+
+    //firebase
+    host: functions.config().database.host,
+    user: functions.config().database.user,
+    password: functions.config().database.password,
+    database: functions.config().database.name,
 });
+
+
 
 //validar la conexion a la base.
 db.connect(err => {
@@ -21,8 +31,3 @@ db.connect(err => {
 });
 
 module.exports = db;
-
-// module.exports = {
-//     secretKey : process.env.secretKey,
-//     tokenExpiresIn : '1h'
-// }

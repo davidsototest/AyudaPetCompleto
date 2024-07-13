@@ -43,9 +43,10 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
     getCommentsId(petInfo.publication_id);
   };
 
+  //busca todos los comentarios de esa publicacion
   const getCommentsId = async(publicationId: number) => {
     fetchComments(publicationId);
-  }
+  };
 
   const style = {
     position: 'absolute' as 'absolute',

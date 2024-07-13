@@ -1,8 +1,8 @@
 const db = require("../config/dbConfig");
-const moment = require("moment");
+// const moment = require("moment");
 
 // Validar formato de la fecha usando moment.js
-const isValidDate = (date) => moment(date, "YYYY-MM-DD", true).isValid();
+// const isValidDate = (date) => moment(date, "YYYY-MM-DD", true).isValid();
 
 // Validar existencia del usuario en la base de datos
 const validateUserExistence = (userId, callback) => {
@@ -43,9 +43,9 @@ const createComment = (req, res) => {
   }
 
   // Validar que la fecha tenga el formato correcto
-  if (!isValidDate(date)) {
-    return res.status(400).json({ message: "Formato de fecha inválido" });
-  }
+  // if (!isValidDate(date)) {
+  //   return res.status(400).json({ message: "Formato de fecha inválido" });
+  // }
 
   // Validar existencia del usuario
   validateUserExistence(user_id, (err, userExists) => {

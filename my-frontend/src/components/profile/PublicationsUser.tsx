@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  Modal,
   Paper,
   styled,
   Table,
@@ -13,9 +15,14 @@ import {
   useTheme,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { usePublications } from "../../context/PublicationsContext";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import ModalAddPublication from "../modal/ModalAddPublication";
+import ModalPublication from "../modal/ModalPublication";
+import { Publication } from "../../context/PublicationsContext";
+import ModalPublicationEdit from "../modal/ModalPublicationEdit";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -43,8 +50,67 @@ interface Props {
 
 const PublicationsUser: React.FC<Props> = (Props) => {
   const theme = useTheme();
+  const [openPublicationModal, setOpenPublicationModal] = useState(false);
+  const [openAddPublicationModal, setOpenAddPublicationModal] = useState(false);
+  const [openEditPublicationModal, setOpenEditPublicationModal] = useState(false);
+  const [petInfo, setPetInfo] = useState<Publication>({
+    publication_id: 0,
+    publication_date: "",
+    publication_description: "",
+    publication_status: 0,
+    user_name: "",
+    user_id: 0,
+    user_ubication: "",
+    user_imgUrl: "",
+    pet_name: "",
+    pet_raze: "",
+    pet_age: 0,
+    pet_color: "",
+    pet_size: "",
+    pet_imgUrl: "",
+  });
+
+  const handleOpenAddPublication = () => setOpenAddPublicationModal(true);
+  const handleClose = () => {
+    setOpenPublicationModal(false);
+    setOpenAddPublicationModal(false);
+    setOpenEditPublicationModal(false);
+  };
   const { user_name, user_id } = useAuth();
-  const { getPublicationUserId, publicationsUserId } = usePublications();
+  const { getPublicationUserId, publicationsUserId, fetchComments, comments } =
+    usePublications();
+
+  //funcion al hacer clic en la card
+  const handleOpenCard = (publication_id: number, publication: Publication) => {
+    setOpenPublicationModal(true);
+    getCommentsId(publication_id);
+    setPetInfo(publication);
+  };
+
+  //funcion para editar la publicacion
+  const handleOpenCardEdit = (publication: Publication) => {
+    setOpenEditPublicationModal(true);
+  }
+
+  //busca todos los comentarios de esa publicacion
+  const getCommentsId = async (publicationId: number) => {
+    await fetchComments(publicationId);
+  };
+
+  //stylos del modal
+  const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 1000,
+    height: "90vh",
+    bgcolor: theme.palette.primary.light,
+    border: `5px solid ${theme.palette.primary.dark}`,
+    borderRadius: "10px",
+    boxShadow: 24,
+    p: 4,
+  };
 
   //validar status de la publicacion
   const statusIs = (status: number) => {
@@ -76,7 +142,7 @@ const PublicationsUser: React.FC<Props> = (Props) => {
 
   return (
     <Grid container sx={{ color: theme.palette.primary.main }}>
-      <Grid xs={12}>
+      <Grid xs={12} textAlign="center" marginBottom={4}>
         <Typography variant="h4">
           Publicaciones de <strong>{user_name.toUpperCase()}</strong>
         </Typography>
@@ -87,19 +153,13 @@ const PublicationsUser: React.FC<Props> = (Props) => {
             <TableHead>
               <TableRow>
                 <StyledTableCell>
-                    <Typography variant="h5">
-                    Mascota
-                    </Typography>
+                  <Typography variant="h5">Mascota</Typography>
                 </StyledTableCell>
                 <StyledTableCell align="center">
-                    <Typography variant="h6">
-                    Estado
-                    </Typography>
+                  <Typography variant="h6">Estado</Typography>
                 </StyledTableCell>
-                <StyledTableCell align="right">
-                    <Typography variant="h6">
-                    {"Opción"}
-                    </Typography>
+                <StyledTableCell align="center">
+                  <Typography variant="h6">Opciones</Typography>
                 </StyledTableCell>
               </TableRow>
             </TableHead>
@@ -110,17 +170,96 @@ const PublicationsUser: React.FC<Props> = (Props) => {
                     <Typography variant="h6">{publication.pet_name}</Typography>
                   </StyledTableCell>
                   <StyledTableCell align="center">
-                    {statusIs(publication.status)}
+                    {statusIs(publication.publication_status)}
                   </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <button className="button button-header">EDITAR</button>
-                  </StyledTableCell>
+
+                  {publication.publication_status === 0 ? (
+                    <StyledTableCell></StyledTableCell>
+                  ) : (
+                    <StyledTableCell align="center">
+                      <button className="button button-header"
+                        onClick={() =>
+                          handleOpenCardEdit(
+                            publication
+                          )
+                        }
+                      >
+                        EDITAR
+                      </button>
+                      <button
+                        className="button button-header"
+                        onClick={() =>
+                          handleOpenCard(
+                            publication.publication_id,
+                            publication
+                          )
+                        }
+                      >
+                        VER
+                      </button>
+                    </StyledTableCell>
+                  )}
                 </StyledTableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </Grid>
+      <Grid display="flex" xs={12} justifyContent="end" marginTop={4}>
+        <button
+          className="button button-primary"
+          style={{ display: "flex", alignItems: "center" }}
+          onClick={handleOpenAddPublication}
+        >
+          <Typography variant="h5" sx={{ marginRight: "10px" }}>
+            Agregar Publicación
+          </Typography>
+          <AddCircleOutlineIcon sx={{ display: "flex" }} />
+        </button>
+      </Grid>
+
+      {/* MODAL  de Agregar publicacion*/}
+      <Modal
+        open={openAddPublicationModal}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <ModalAddPublication handleClose={handleClose} user_id={user_id}/>
+        </Box>
+      </Modal>
+
+      {/* MODAL de ver publicacion */}
+      <Modal
+        open={openPublicationModal}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <ModalPublication
+            comments={comments}
+            petInfo={petInfo}
+            handleClose={handleClose}
+          />
+        </Box>
+      </Modal>
+
+      {/* MODAL de EDITAR publicacion */}
+      <Modal
+        open={openEditPublicationModal}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <ModalPublicationEdit
+            // petInfo={petInfo}
+            handleClose={handleClose}
+          />
+        </Box>
+      </Modal>
     </Grid>
   );
 };
