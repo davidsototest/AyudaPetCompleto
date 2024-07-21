@@ -18,7 +18,7 @@ const CardsTree: React.FC<Props> = (Props) => {
     <Grid container padding={7}>
       <Grid container xs={12} justifyContent="center" textAlign="center" padding={5}>
         <Grid md={6}>
-          <Typography variant="h3" color={theme.palette.primary.main}>
+          <Typography variant="h4" color={theme.palette.primary.main}>
             Amor, Atención y Cuidados: Garantizando la Felicidad y Salud de tu Compañero Peludo
           </Typography>
         </Grid>
@@ -34,7 +34,9 @@ const CardsTree: React.FC<Props> = (Props) => {
         >
           <CardLarge
             title={imgCard.title}
-            img={imgCard.img}
+            img1={imgCard.img1}
+            img2={imgCard.img2}
+            img3={imgCard.img3}
             describe={imgCard.describe}
             ver={true}
             nameButtom={"Saber más"}

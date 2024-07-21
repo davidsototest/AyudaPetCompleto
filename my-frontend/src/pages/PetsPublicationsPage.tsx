@@ -1,7 +1,6 @@
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React, { useEffect, useState } from "react";
 import PublicationsCardSmall from "../layouts/PublicationsCardSmall";
-import { petInfos } from "../components/data/petInfo";
 import { Typography, useTheme } from "@mui/material";
 import PublicationsInfo from "../layouts/PublicationsInfo";
 import { maxWidth } from "../layouts/width";
@@ -10,14 +9,13 @@ import {
   detailInfo,
 } from "../components/data/publicationInfoPublications";
 import { usePublications } from "../context/PublicationsContext";
-import { Publication } from "../context/PublicationsContext";
 
 interface Props {
   // Define props here
 }
 
 const PetsPublicationsPage: React.FC<Props> = (Props) => {
-  const [publicationsData, setPublicationsData] = useState<Publication[]>([]);
+  // const [publicationsData, setPublicationsData] = useState<Publication[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -31,19 +29,19 @@ const PetsPublicationsPage: React.FC<Props> = (Props) => {
         setIsLoading(true);
         try {
           await fetchPublications();
-          setPublicationsData(publications);
+          // setPublicationsData(publications);
         } catch (error) {
           setError(true);
           console.log("Error al consultar publicaciones: ", error);
         } finally {
-          setIsLoading(false);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1500); 
         }
       };
 
       getPublications();
-    } else {
-      setPublicationsData(publications);
-    }
+    };
   }, []);
 
   return (
@@ -64,7 +62,7 @@ const PetsPublicationsPage: React.FC<Props> = (Props) => {
       ) : (
         <Grid marginBottom="50px">
           <PublicationsCardSmall
-            petInfos={publicationsData}
+            petInfos={publications}
             skeleton={isLoading}
           />
         </Grid>

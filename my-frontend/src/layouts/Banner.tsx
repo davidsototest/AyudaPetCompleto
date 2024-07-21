@@ -1,39 +1,47 @@
-
-import React from 'react';
-import ButtonPrimary from '../components/buttons/ButtonPrimary';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import Grid from "@mui/material/Unstable_Grid2/Grid2";
+import TitleParagraphy from "../components/others/TitleParagraphy";
+import CarouselImg from "../components/caruosel/CarouselImg";
+import { styled } from "@mui/material";
 
 interface Props {
-    // Define props here
+  // Define props here
 }
 
 const Banner: React.FC<Props> = (Props) => {
 
-    const navigate = useNavigate();
+  const ShadowedGrid = styled(Grid)(({ theme }) => ({
+    position: "relative",
+    height: "400px",
+    "&::before, &::after": {
+      content: '""',
+      position: "absolute",
+      left: 0,
+      right: 0,
+      height: "25px",
+      zIndex: 1,
+      pointerEvents: "none",
+    },
+    "&::before": {
+      top: 0,
+      background: `linear-gradient(to bottom, ${theme.palette.secondary.main} 1%, rgba(255, 255, 255, 0))`,
+    },
+    "&::after": {
+      bottom: 0,
+      background: `linear-gradient(to top, ${theme.palette.secondary.main} 1%, rgba(255, 255, 255, 0))`,
+    },
+  }));
 
-    return (
-        <div className="">
-            <div className="cont-banner">
-                <div className="banner">                
-                    <div className="cont-banner1">
-                        <h2 className="font-style-subtitle">Encuentra mascotas perdidas con AyudaPet</h2>
-                        <p className="font-style-normalText-italic">
-                            Publica, comenta y comparte avistamientos para reuinir mascotas con sus dueños.
-                            Juntos podemos ayudar a reunir familias peludas!
-                        </p>
-                        <ButtonPrimary
-                            onClick={() => navigate("publications")}
-                        >
-                            {"VER LAS MASCOTAS"}
-                        </ButtonPrimary>
-                    </div>
-                    <div className="cont-banner2">                                                       
-                        <img src="https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/imagenesGrupo12%2Fimg001.jpg?alt=media&token=fdfa4317-3447-405f-b097-e38ceb3f6dbe" alt="aves" className="img" />                                                                 
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+  return (
+    <Grid container columnSpacing={2} paddingTop={5}>
+      <Grid xs={12} md={6}>
+        <TitleParagraphy />
+      </Grid>
+      <ShadowedGrid xs={12} md={6}>
+        <CarouselImg />
+      </ShadowedGrid>
+    </Grid>
+  );
 };
 
 export default Banner;

@@ -1,6 +1,8 @@
 import {
+  Backdrop,
   Box,
   Button,
+  CircularProgress,
   Modal,
   Paper,
   styled,
@@ -23,6 +25,7 @@ import ModalAddPublication from "../modal/ModalAddPublication";
 import ModalPublication from "../modal/ModalPublication";
 import { Publication } from "../../context/PublicationsContext";
 import ModalPublicationEdit from "../modal/ModalPublicationEdit";
+import { ToastiError } from "../toasti/ToastiError";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -44,6 +47,25 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+//datos vacio de tipo Publications
+export const dataTest = {
+  publication_id: 0,
+  publication_date: "",
+  publication_description: "",
+  publication_status: 0,
+  user_name: "",
+  user_id: 0,
+  pet_id: 0,
+  user_ubication: "",
+  user_imgUrl: "",
+  pet_name: "",
+  pet_raze: "",
+  pet_age: 0,
+  pet_color: "",
+  pet_size: "",
+  pet_imgUrl: "",
+};
+
 interface Props {
   // Define props here
 }
@@ -52,23 +74,11 @@ const PublicationsUser: React.FC<Props> = (Props) => {
   const theme = useTheme();
   const [openPublicationModal, setOpenPublicationModal] = useState(false);
   const [openAddPublicationModal, setOpenAddPublicationModal] = useState(false);
-  const [openEditPublicationModal, setOpenEditPublicationModal] = useState(false);
-  const [petInfo, setPetInfo] = useState<Publication>({
-    publication_id: 0,
-    publication_date: "",
-    publication_description: "",
-    publication_status: 0,
-    user_name: "",
-    user_id: 0,
-    user_ubication: "",
-    user_imgUrl: "",
-    pet_name: "",
-    pet_raze: "",
-    pet_age: 0,
-    pet_color: "",
-    pet_size: "",
-    pet_imgUrl: "",
-  });
+  const [openEditPublicationModal, setOpenEditPublicationModal] =
+    useState(false);
+  const [dataEdit, setDataEdit] = useState<Publication>(dataTest);
+  const [petInfo, setPetInfo] = useState<Publication>(dataTest);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleOpenAddPublication = () => setOpenAddPublicationModal(true);
   const handleClose = () => {
@@ -89,8 +99,9 @@ const PublicationsUser: React.FC<Props> = (Props) => {
 
   //funcion para editar la publicacion
   const handleOpenCardEdit = (publication: Publication) => {
+    setDataEdit(publication);
     setOpenEditPublicationModal(true);
-  }
+  };
 
   //busca todos los comentarios de esa publicacion
   const getCommentsId = async (publicationId: number) => {
@@ -140,6 +151,11 @@ const PublicationsUser: React.FC<Props> = (Props) => {
     getPublicationsUserId();
   }, []);
 
+  //funcion para el clic afuera del spinner
+  const backdropToasti = () => {
+    ToastiError("¡Espere mientras trabajamos! ⏳");
+  };
+
   return (
     <Grid container sx={{ color: theme.palette.primary.main }}>
       <Grid xs={12} textAlign="center" marginBottom={4}>
@@ -177,12 +193,9 @@ const PublicationsUser: React.FC<Props> = (Props) => {
                     <StyledTableCell></StyledTableCell>
                   ) : (
                     <StyledTableCell align="center">
-                      <button className="button button-header"
-                        onClick={() =>
-                          handleOpenCardEdit(
-                            publication
-                          )
-                        }
+                      <button
+                        className="button button-header"
+                        onClick={() => handleOpenCardEdit(publication)}
                       >
                         EDITAR
                       </button>
@@ -226,7 +239,7 @@ const PublicationsUser: React.FC<Props> = (Props) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <ModalAddPublication handleClose={handleClose} user_id={user_id}/>
+          <ModalAddPublication handleClose={handleClose} user_id={user_id} />
         </Box>
       </Modal>
 
@@ -254,12 +267,17 @@ const PublicationsUser: React.FC<Props> = (Props) => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <ModalPublicationEdit
-            // petInfo={petInfo}
-            handleClose={handleClose}
-          />
+          <ModalPublicationEdit petInfo={dataEdit} handleClose={handleClose} setIsLoading={setIsLoading}/>
         </Box>
       </Modal>
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1000 }}
+        open={isLoading}
+        onClick={backdropToasti}
+      >
+        <CircularProgress color="primary" />
+      </Backdrop>
     </Grid>
   );
 };

@@ -10,7 +10,7 @@ interface Props {
 
 const RegisterNewUser: React.FC<Props> = (Props) => {
 
-    const img = "https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/register%2FimgRegister.svg?alt=media&token=e24b4505-c426-4aa4-98ac-4b3b11ce2520";
+    const img = "https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/CAROUSELimagenesRectangulares%2Frobot%2FMnEEUg7WT7iqBIHc0IKZdg.webp?alt=media&token=c7297d92-d717-4347-8c48-49cc4f617634";
 
     return (
         <Grid container maxWidth={maxWidth}>
@@ -18,7 +18,7 @@ const RegisterNewUser: React.FC<Props> = (Props) => {
                 <RegisterUser />
             </Grid>
             <Grid xs={12} md={6} display="flex" justifyContent="center" alignItems="center" className="animate__animated animate__bounceIn">
-                <img src={img} alt="img-register" style={{height: "400px"}}/>
+                <img src={img} alt="img-register" style={{height: "400px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.8)" }}/>
             </Grid>
         </Grid>
     );

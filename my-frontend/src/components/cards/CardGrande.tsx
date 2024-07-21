@@ -43,7 +43,9 @@ const CardGrande: React.FC<Props> = ({ publi, describe }) => {
             >
               <CardLarge
                 title={desc.titleImg}
-                img={desc.img}
+                img1={desc.img1}
+                img2={desc.img2}
+                img3={desc.img3}
                 describe={desc.descImg}
               />
             </Grid>

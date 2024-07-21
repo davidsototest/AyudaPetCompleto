@@ -11,6 +11,7 @@ import { getPublications, getPublicationsUserId } from "../services/get/publicat
 import { getComments } from "../services/get/commentsService";
 import { sendComments } from "../services/send/postCommentService";
 import { useAuth } from "./AuthContext";
+import { publicationUpdateService } from "../services/send/publicationUpdateService";
 
 
 //interfaz de agregar una publicacion nueva
@@ -24,6 +25,20 @@ export interface PublicationAdd {
   user_id: number;
   date: string;
   description: string;
+};
+
+//actualizar publicacion
+export interface PublicationUpdate {
+  name_pet: string;
+  raze_pet: string;
+  age_pet: number;
+  color_pet: string;
+  size_pet: string;
+  imgUrl_pet: string;
+  date: string;
+  description: string;
+  user_id: number;
+  pet_id: number;
 };
 
 //interfaz para guardar comentarios
@@ -57,6 +72,7 @@ export interface Publication {
   user_ubication: string;
   user_imgUrl: string;
   pet_name: string;
+  pet_id: number;
   pet_raze: string;
   pet_age: number;
   pet_color: string;
@@ -68,6 +84,7 @@ interface PublicationsContextType {
   fetchPublications: () => Promise<void>;
   publications: Publication[];
   addPublication: (publication: PublicationAdd) => void;
+  publicationUpdate: (publicationUpdateData: PublicationUpdate, pet_id: number) => void;
   removePublication: (id: string) => void;
   fetchComments: (publicationId: number) => Promise<void>;
   getPublicationUserId: (user_id: number) => Promise<void>;
@@ -125,8 +142,24 @@ export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
     } catch (error) {
       console.log(error)
     }
-  }
+  };
 
+  //actualziar publicacion
+  const publicationUpdate = async (publicationUpdateData: PublicationUpdate, pet_id: number) => {
+    try {
+      const response = await publicationUpdateService(publicationUpdateData, token as string, pet_id );
+      if(response){
+        ToastiSuccess("¡Publicación actualizada con éxito! ✅");
+      } else {
+        ToastiError("¡Error al intentar actualiar la publicación! ✅");
+      }
+    } catch (error) {
+      ToastiError("Hubo un error al añadir la publicación. 😬");
+      console.error("Error al añadir publicación:", error);
+    }
+  };
+
+  //crear publicacion
   const addPublication = (publication: PublicationAdd) => {
     // try {
     //   setPublications((prevPublications) => [...prevPublications, publication]);
@@ -137,6 +170,7 @@ export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
     // }
   };
 
+  //remover publicacion
   const removePublication = (id: string) => {
     // try {
     //   setPublications((prevPublications) =>
@@ -193,6 +227,7 @@ export const PublicationsProvider: React.FC<{ children: ReactNode }> = ({
         getPublicationUserId,
         publicationsUserId,
         addPublication,
+        publicationUpdate,
         removePublication,
         fetchPublications,
         fetchComments,

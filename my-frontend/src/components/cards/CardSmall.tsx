@@ -11,7 +11,7 @@ import {
   useTheme,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PetInfo } from "../data/petInfo";
 import ModalPublication from "../modal/ModalPublication";
 // import { comments } from "../data/commentsTest";
@@ -33,6 +33,23 @@ const textStyle = {
 
 const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
   const theme = useTheme();
+  const [petInfoState, setPetInfoState] = useState<Publication>(petInfo || {
+    publication_id: 0,
+    publication_date: "",
+    publication_description: "",
+    publication_status: 0,
+    user_name: "",
+    user_id: 0,
+    user_ubication: "",
+    user_imgUrl: "",
+    pet_name: "",
+    pet_raze: "",
+    pet_age: 0,
+    pet_color: "",
+    pet_size: "",
+    pet_imgUrl: "",
+  });
+  
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
   const {fetchComments, comments} = usePublications();
@@ -79,8 +96,8 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
             <CardMedia
               component="img"
               height="180px"
-              image={petInfo.pet_imgUrl}
-              alt={petInfo.pet_imgUrl}
+              image={petInfoState.pet_imgUrl}
+              alt={petInfoState.pet_imgUrl}
             />
           )}
           <CardContent>
@@ -90,7 +107,7 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
                   <Skeleton width="100%" height="50px" />
                 ) : (
                   <Typography variant="h5" sx={{ fontWeight: "700" }}>
-                    {petInfo.pet_name}
+                    {petInfoState.pet_name}
                   </Typography>
                 )}
               </Grid>
@@ -107,7 +124,7 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
                   <Skeleton width="100%" height="50px" />
                 ) : (
                   <Typography sx={textStyle}>
-                    {`${petInfo.pet_size} cm de alto | ${petInfo.pet_color} | ${petInfo.pet_raze}`}
+                    {`${petInfoState.pet_size} cm de alto | ${petInfoState.pet_color} | ${petInfoState.pet_raze}`}
                   </Typography>
                 )}
               </Grid>
@@ -116,7 +133,7 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
                   {skeleton ? (
                     <Skeleton variant="circular" width={40} height={40} />
                   ) : (
-                    <Avatar src={petInfo.user_imgUrl} alt={petInfo.user_imgUrl} />
+                    <Avatar src={petInfoState.user_imgUrl} alt={petInfoState.user_imgUrl} />
                   )}
                 </Grid>
                 <Grid xs={8.5}>
@@ -124,8 +141,8 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
                     <Skeleton width="100%" height="50px" />
                   ) : (
                     <>
-                      <Typography variant="h6">{petInfo.user_name}</Typography>
-                      <Typography>{petInfo.user_ubication}</Typography>
+                      <Typography variant="h6">{petInfoState.user_name}</Typography>
+                      <Typography>{petInfoState.user_ubication}</Typography>
                     </>
                   )}
                 </Grid>
@@ -144,7 +161,7 @@ const CardSmall: React.FC<CardSmallProps> = ({ petInfo, skeleton=false }) => {
       >
         <Box sx={style}>
           {/* aqui hay que modificar de donde vienen los datos para pasarle al modal...  */}
-          <ModalPublication comments={comments} petInfo={petInfo} handleClose={handleClose}/>
+          <ModalPublication comments={comments} petInfo={petInfoState} handleClose={handleClose}/>
         </Box>
       </Modal>
     </>

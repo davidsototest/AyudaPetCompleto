@@ -1,6 +1,5 @@
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React, { useState } from "react";
-import { PetInfo } from "../components/data/petInfo";
 import CardSmall from "../components/cards/CardSmall";
 import { Pagination, Typography } from "@mui/material";
 import { Publication } from "../context/PublicationsContext";

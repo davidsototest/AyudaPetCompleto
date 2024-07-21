@@ -15,11 +15,6 @@ export interface RouteItem {
   element: React.ComponentType<any>;
 }
 
-// export interface User {
-//   id: string;
-//   token: string;
-// }
-
 export const getRoutes = (token: string | null): RouteItem[] =>
   [
     { name: "Home", path: "/", element: HomePage },

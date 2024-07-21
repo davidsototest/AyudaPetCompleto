@@ -36,211 +36,208 @@ interface Props {
 }
 
 const ModalAddPublication: React.FC<Props> = ({ handleClose, user_id }) => {
-  // const theme = useTheme();
-  // const { addPublication } = usePublications();
+  const theme = useTheme();
+  const { addPublication } = usePublications();
 
-  // const { control, handleSubmit, setValue, formState: { errors } } = useForm<PublicationAdd>({
-  //   resolver: yupResolver(schema),
-  // });
-  // const [preview, setPreview] = useState<string | null>(null);
-  // const [imageFile, setImageFile] = useState<File | null>(null);
+  const { control, handleSubmit, setValue, formState: { errors } } = useForm<PublicationAdd>({
+    resolver: yupResolver(schema),
+  });
+  const [preview, setPreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // const onSubmit = async (data: PublicationAdd) => {
-  //   console.log("aqui")
-  //   const submissionData = {
-  //     ...data,
-  //     user_id: user_id,
-  //     date: new Date().toISOString().split('T')[0],
-  //   };
-  //   console.log(submissionData);
-  //   try {
-  //     await addPublication(submissionData);
-  //   } catch (error) {
-  //     console.log("error en onSubmi de compoennte" + error)
-  //   } 
-  // };
+  const onSubmit = async (data: PublicationAdd) => {
+    console.log("aqui")
+    const submissionData = {
+      ...data,
+      user_id: user_id,
+      date: new Date().toISOString().split('T')[0],
+    };
+    console.log(submissionData);
+    try {
+      await addPublication(submissionData);
+    } catch (error) {
+      console.log("error en onSubmi de compoennte" + error)
+    } 
+  };
 
-  // //cambio de imagen en el input
-  // const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = event.target.files?.[0];
-  //   if (file) {
-  //     const fileTypes = ["image/jpeg", "image/png", "image/webp", "image/tiff"];
-  //     if (!fileTypes.includes(file.type)) {
-  //       alert("Please upload an image in JPG, PNG, WEBP, or TIFF format.");
-  //       setImageFile(null);
-  //       setPreview(null);
-  //       return;
-  //     }
-  //     setImageFile(file);
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setPreview(reader.result as string);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
+  //cambio de imagen en el input
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const fileTypes = ["image/jpeg", "image/png", "image/webp", "image/tiff"];
+      if (!fileTypes.includes(file.type)) {
+        alert("Please upload an image in JPG, PNG, WEBP, or TIFF format.");
+        setImageFile(null);
+        setPreview(null);
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-  // const style = {
-  //   height: "1px",
-  //   marginTop: "10px",
-  //   marginBottom: "10px",
-  // };
+  const style = {
+    height: "1px",
+    marginTop: "10px",
+    marginBottom: "10px",
+  };
 
   return (
-    // <Grid container sx={{ color: theme.palette.primary.main }}>
-    //   <Grid
-    //     xs={11}
-    //     textAlign="center"
-    //     sx={{ color: theme.palette.primary.dark }}
-    //   >
-    //     <Typography
-    //       variant="h4"
-    //       className="animate__animated animate__backInDown"
-    //     >
-    //       Agregar Publicación
-    //     </Typography>
-    //   </Grid>
-    //   <Grid xs={1} justifyContent="end" display="flex">
-    //     <CloseIcon
-    //       sx={{
-    //         color: theme.palette.primary.dark,
-    //         fontSize: 40,
-    //         cursor: "pointer",
-    //       }}
-    //       onClick={handleClose}
-    //     />
-    //   </Grid>
-    //   <Grid xs={12}>
-    //     <Divider style={style} />
-    //   </Grid>
-    //   <Grid container marginTop={5} xs={12}>
-    //     <Grid xs={6}>
-    //       <Typography variant="h5"><strong>Datos de la mascota</strong></Typography>
-    //       <form onSubmit={handleSubmit(onSubmit)}>
-    //         <Controller
-    //           name="name_pet"
-    //           control={control}
-    //           defaultValue=""
-    //           render={({ field }) => (
-    //             <TextField 
-    //               {...field} 
-    //               label="Nombre de la mascota" 
-    //               fullWidth 
-    //               margin="normal" 
-    //               error={!!errors.name_pet}
-    //               helperText={errors.name_pet?.message}
-    //             />
-    //           )}
-    //         />
-    //         <Controller
-    //           name="raze_pet"
-    //           control={control}
-    //           defaultValue=""
-    //           render={({ field }) => (
-    //             <TextField 
-    //               {...field} 
-    //               label="Raza" 
-    //               fullWidth 
-    //               margin="normal"
-    //               error={!!errors.raze_pet}
-    //               helperText={errors.raze_pet?.message}
-    //             />
-    //           )}
-    //         />
-    //         <Controller
-    //           name="age_pet"
-    //           control={control}
-    //           defaultValue={0}
-    //           render={({ field }) => (
-    //             <TextField 
-    //               {...field} 
-    //               label="Edad aprox." 
-    //               fullWidth 
-    //               margin="normal"
-    //               error={!!errors.age_pet}
-    //               helperText={errors.age_pet?.message}
-    //             />
-    //           )}
-    //         />
-    //         <Controller
-    //           name="color_pet"
-    //           control={control}
-    //           defaultValue=""
-    //           render={({ field }) => (
-    //             <TextField 
-    //               {...field} 
-    //               label="Color" 
-    //               fullWidth 
-    //               margin="normal"
-    //               error={!!errors.color_pet}
-    //               helperText={errors.color_pet?.message}
-    //             />
-    //           )}
-    //         />
-    //         <Controller
-    //           name="size_pet"
-    //           control={control}
-    //           defaultValue={0}
-    //           render={({ field }) => (
-    //             <TextField 
-    //               {...field} 
-    //               label="Altura Aprox." 
-    //               fullWidth 
-    //               margin="normal"
-    //               error={!!errors.size_pet}
-    //               helperText={errors.size_pet?.message}
-    //             />
-    //           )}
-    //         />
-    //         <Controller
-    //           name="description"
-    //           control={control}
-    //           defaultValue=""
-    //           render={({ field }) => (
-    //             <TextField
-    //               {...field}
-    //               label="Descripción"
-    //               multiline
-    //               rows={3}
-    //               fullWidth
-    //               margin="normal"
-    //               error={!!errors.description}
-    //               helperText={errors.description?.message}
-    //             />
-    //           )}
-    //         />
-    //         <Grid xs={12} justifyContent="center" display="flex" marginTop={3}>
-    //           <button type="submit" className="button button-primary">
-    //             ENVIAR FORMULARIO
-    //           </button>
-    //         </Grid>
-    //       </form>
-    //     </Grid>
+    <Grid container sx={{ color: theme.palette.primary.main }}>
+      <Grid
+        xs={11}
+        textAlign="center"
+        sx={{ color: theme.palette.primary.dark }}
+      >
+        <Typography
+          variant="h4"
+          className="animate__animated animate__backInDown"
+        >
+          Agregar Publicación
+        </Typography>
+      </Grid>
+      <Grid xs={1} justifyContent="end" display="flex">
+        <CloseIcon
+          sx={{
+            color: theme.palette.primary.dark,
+            fontSize: 40,
+            cursor: "pointer",
+          }}
+          onClick={handleClose}
+        />
+      </Grid>
+      <Grid xs={12}>
+        <Divider style={style} />
+      </Grid>
+      <Grid container marginTop={5} xs={12}>
+        <Grid xs={6}>
+          <Typography variant="h5"><strong>Datos de la mascota</strong></Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="name_pet"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField 
+                  {...field} 
+                  label="Nombre de la mascota" 
+                  fullWidth 
+                  margin="normal" 
+                  error={!!errors.name_pet}
+                  helperText={errors.name_pet?.message}
+                />
+              )}
+            />
+            <Controller
+              name="raze_pet"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField 
+                  {...field} 
+                  label="Raza" 
+                  fullWidth 
+                  margin="normal"
+                  error={!!errors.raze_pet}
+                  helperText={errors.raze_pet?.message}
+                />
+              )}
+            />
+            <Controller
+              name="age_pet"
+              control={control}
+              defaultValue={0}
+              render={({ field }) => (
+                <TextField 
+                  {...field} 
+                  label="Edad aprox." 
+                  fullWidth 
+                  margin="normal"
+                  error={!!errors.age_pet}
+                  helperText={errors.age_pet?.message}
+                />
+              )}
+            />
+            <Controller
+              name="color_pet"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField 
+                  {...field} 
+                  label="Color" 
+                  fullWidth 
+                  margin="normal"
+                  error={!!errors.color_pet}
+                  helperText={errors.color_pet?.message}
+                />
+              )}
+            />
+            <Controller
+              name="size_pet"
+              control={control}
+              defaultValue={0}
+              render={({ field }) => (
+                <TextField 
+                  {...field} 
+                  label="Altura Aprox." 
+                  fullWidth 
+                  margin="normal"
+                  error={!!errors.size_pet}
+                  helperText={errors.size_pet?.message}
+                />
+              )}
+            />
+            <Controller
+              name="description"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Descripción"
+                  multiline
+                  rows={3}
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.description}
+                  helperText={errors.description?.message}
+                />
+              )}
+            />
+            <Grid xs={12} justifyContent="center" display="flex" marginTop={3}>
+              <button type="submit" className="button button-primary">
+                ENVIAR FORMULARIO
+              </button>
+            </Grid>
+          </form>
+        </Grid>
 
-    //     <Grid xs={6} justifyContent="center" alignContent="center">
-    //       <Avatar
-    //         src={preview || ""}
-    //         sx={{ width: 250, height: 250, margin: "0 auto 20px auto" }}
-    //       />
-    //       <Grid xs={12} justifyContent="center" display="flex">
-    //         <input
-    //           accept="image/jpeg, image/png, image/webp, image/tiff"
-    //           style={{ display: "none", margin: "auto" }}
-    //           id="upload-photo"
-    //           type="file"
-    //           onChange={handleImageChange}
-    //         />
-    //         <label htmlFor="upload-photo">
-    //           <Button variant="contained" component="span">
-    //             Subir Imagen
-    //           </Button>
-    //         </label>
-    //       </Grid>
-    //     </Grid>
-    //   </Grid>
-    // </Grid>
-    <Grid>
-      <InContrucction />
+        <Grid xs={6} justifyContent="center" alignContent="center">
+          <Avatar
+            src={preview || ""}
+            sx={{ width: 250, height: 250, margin: "0 auto 20px auto" }}
+          />
+          <Grid xs={12} justifyContent="center" display="flex">
+            <input
+              accept="image/jpeg, image/png, image/webp, image/tiff"
+              style={{ display: "none", margin: "auto" }}
+              id="upload-photo"
+              type="file"
+              onChange={handleImageChange}
+            />
+            <label htmlFor="upload-photo">
+              <Button variant="contained" component="span">
+                Subir Imagen
+              </Button>
+            </label>
+          </Grid>
+        </Grid>
+      </Grid>
     </Grid>
   );
 };
