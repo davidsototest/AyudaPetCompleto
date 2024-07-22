@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardContent, Typography, useTheme } from "@mui/material";
+import { Card, CardContent, Typography, useTheme, useMediaQuery } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import {
   PublicationMainInfo,
@@ -15,6 +15,14 @@ interface Props {
 
 const CardGrande: React.FC<Props> = ({ publi, describe }) => {
   const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.only('xs'));
+  const isSmMd = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const isLgUp = useMediaQuery(theme.breakpoints.up('lg'));
+
+  let columnSpacingValue = 0;
+  if (isSmMd) {
+    columnSpacingValue = 2;
+  }
 
   return (
     <Card
@@ -24,18 +32,19 @@ const CardGrande: React.FC<Props> = ({ publi, describe }) => {
         boxShadow: "none",
       }}
     >
-      <Grid container rowSpacing={3}>
-        <Grid xs={12}>
-          <Typography variant="h3">{publi.title}</Typography>
+      <Grid container display="flex" justifyContent="center">
+        <Grid xs={11} paddingBottom={2}>
+          <Typography variant="h4">{publi.title}</Typography>
         </Grid>
-        <Grid xs={12} paddingRight={50}>
+        <Grid xs={11}>
           <Typography>{publi.describe}</Typography>
         </Grid>
-        <Grid container width={"100%"} marginTop={3}>
+        <Grid container width={"100%"} marginTop={3} display="flex" justifyContent="center" columnSpacing={columnSpacingValue}>
           {describe.map((desc) => (
             <Grid
               key={desc.titleImg}
               xs={12}
+              sm={5}
               md={4}
               display="flex"
               justifyContent="center"

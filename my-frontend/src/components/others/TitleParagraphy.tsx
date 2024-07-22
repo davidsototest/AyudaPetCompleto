@@ -1,4 +1,4 @@
-import { Typography, useTheme } from "@mui/material";
+import { Typography, useTheme, useMediaQuery } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React from "react";
 import { useNavigate } from "react-router-dom";
@@ -10,12 +10,27 @@ interface Props {
 
 const TitleParagraphy: React.FC<Props> = (Props) => {
   const navigate = useNavigate();
-  const theme = useTheme()
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <Grid container rowSpacing={4} sx={{color: theme.palette.primary.main}}>
+    <Grid 
+      container 
+      rowSpacing={4} 
+      sx={{
+        color: theme.palette.primary.main,
+        padding: {
+          xs: 4,
+          md: 0
+        },
+        paddingTop: {
+          xs: 0,
+          md: 0
+        }
+        }}
+      >
       <Grid>
-        <Typography variant="h2">
+        <Typography variant={isXs ? 'h3' : 'h2'}>
           Encuentra mascotas perdidas con <strong>AyudaPet</strong>
         </Typography>
       </Grid>

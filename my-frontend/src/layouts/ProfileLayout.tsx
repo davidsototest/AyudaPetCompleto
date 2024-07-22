@@ -9,7 +9,7 @@ interface Props {
 
 const ProfileLayout: React.FC<Props> = (Props) => {
   const img =
-    "https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/inContrucctions%2Fcat-trabajd.webp?alt=media&token=e2a78485-96d9-4ad9-a016-f0c085f8c9ca";
+    "https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/CAROUSELimagenesCuadras%2Fposter%2FAyudaPet1%20(16).webp?alt=media&token=369ebda4-c0fb-4ad8-bb6e-68a31927b24d";
 
   return (
     <Grid container>

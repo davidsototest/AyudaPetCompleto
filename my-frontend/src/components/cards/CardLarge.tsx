@@ -34,7 +34,7 @@ const CardLarge: React.FC<Props> = ({
   return (
     <Card
       sx={{
-        minWidth: 275,
+        // minWidth: 275,
         maxWidth: 350,
         padding: "20px",
         background: theme.palette.primary.light,

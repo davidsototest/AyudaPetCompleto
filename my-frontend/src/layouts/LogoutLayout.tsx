@@ -9,7 +9,7 @@ interface Props {
 
 const LogoutLayout: React.FC<Props> = (Props) => {
 
-    const img = "https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/login%2Flogin-app.svg?alt=media&token=64cc51bf-ea04-49d7-a653-731a740bb34f";
+    const img = "https://firebasestorage.googleapis.com/v0/b/grupo12-f7def.appspot.com/o/CAROUSELimagenesCuadras%2Fposter%2FAyudaPet1%20(6).webp?alt=media&token=b25e611e-5228-4340-a90a-019b206f9c25";
 
     return (
         <Grid container>

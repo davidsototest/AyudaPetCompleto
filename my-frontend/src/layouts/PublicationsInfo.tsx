@@ -5,6 +5,7 @@ import { PublicationDetail, PublicationMainInfo,  } from "../components/data/pub
 import { useNavigate } from "react-router-dom";
 import ButtonSecondary from "../components/buttons/ButtonSecondary";
 import { maxWidth } from "./width";
+import { useTheme } from "@mui/material";
 
 interface Props {
   mainInfo: PublicationMainInfo,
@@ -18,12 +19,14 @@ const PublicationsInfo: React.FC<Props> = ({mainInfo, detailInfo, statusButtom=f
 
   const navigate = useNavigate();
   const [status] = useState(statusButtom);
+  const theme = useTheme()
+  
 
   return (
     // <!-- ----------- publica y encuentra PABLO --------------- -->
 
-    <Grid container width={maxWidth} margin={"auto"} marginTop={9}> 
-      <Grid>
+    <Grid container margin={"auto"} marginTop={9} > 
+      <Grid xs={12}>
         <CardGrande publi={mainInfo} describe={detailInfo} />
       </Grid>
       {status? (

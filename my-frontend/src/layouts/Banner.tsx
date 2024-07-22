@@ -33,7 +33,16 @@ const Banner: React.FC<Props> = (Props) => {
   }));
 
   return (
-    <Grid container columnSpacing={2} paddingTop={5}>
+    <Grid 
+      container 
+      columnSpacing={2} 
+      sx={{
+        paddingTop: {
+          xs: 0,
+          md: 4
+        }
+      }}
+    >
       <Grid xs={12} md={6}>
         <TitleParagraphy />
       </Grid>

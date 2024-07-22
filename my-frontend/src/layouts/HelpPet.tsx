@@ -10,8 +10,8 @@ interface Props {
 
 const HelpPet: React.FC<Props> = (Props) => {
     return (
-        <Grid container padding={7} display="flex" justifyContent="center">
-            <Grid>
+        <Grid container display="flex" justifyContent="center" paddingTop={4}>
+            <Grid xs={12} sm={10} display="flex" justifyContent="center" width={"100%"}>
                 <CardHelp
                     title={helpPet[0].title}
                     describe={helpPet[0].describe}

@@ -15,15 +15,15 @@ interface Props {
 
 const HomePage: React.FC<Props> = (Props) => {
     return (
-        <Grid>
-            <Grid width={maxWidth} margin={"auto"}>
+        <Grid container>
+            <Grid maxWidth={maxWidth} margin={"auto"}>
                 <Banner />
                 <CardsTree />
                 <HelpPet />
                 <PublicationsInfo mainInfo={mainInfo} detailInfo={detailInfo} statusButtom={true} path="record" nameButtom="REGISTRARME"/>
             </Grid>
-            <Grid paddingTop={10} paddingBottom={10}>
-            <Sponsors />
+            <Grid paddingTop={5} paddingBottom={5} width={"100%"}>
+                <Sponsors />
             </Grid>
             <Grid width={maxWidth} margin={"auto"}>
                 <Metrics />
