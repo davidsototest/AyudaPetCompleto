@@ -11,7 +11,7 @@ interface Props {
 const Sponsors: React.FC<Props> = (Props) => {
   return (
     // <!--  ---------   Seccion de patrocinadores david -------- -->
-    <Grid container bgcolor="primary.light" padding={7} display="flex" justifyContent="center">
+    <Grid container bgcolor="primary.light" paddingTop={7} paddingBottom={7} display="flex" justifyContent="center">
       <Grid container maxWidth={maxWidth}>
         <Grid xs={12} marginBottom={3} textAlign="center">
           <Typography variant="h3" textAlign="center" color="primary.main">

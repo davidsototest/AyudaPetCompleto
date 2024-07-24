@@ -50,7 +50,14 @@ const Header: React.FC<HeaderProps> = () => {
       sx={{
         backgroundColor: "rgba(36, 27, 53, 0.95)",
         borderRadius: "0% 0% 20px 20px",
+        width: "93%",
+        margin: '0 auto',
+        left: 0,
+        right: 0,
+        display: 'flex',
+        justifyContent: 'center',
       }}
+      id={"AQUIIIIII"}
     >
       <Container maxWidth="xl">
         <Toolbar disableGutters>

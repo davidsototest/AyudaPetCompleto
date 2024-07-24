@@ -1,5 +1,4 @@
 import { Box, useTheme } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import React, { useState } from "react";
 import SwipeableViews from "react-swipeable-views";
 import { autoPlay } from "react-swipeable-views-utils";
@@ -22,8 +21,7 @@ const CarouselSolo: React.FC<Img> = ({ images, height }) => {
 
   return (
     <Box
-      sx={{ width: "100%", flexGrow: 1, position: "relative" }}
-    >
+      sx={{ width: "100%", flexGrow: 1, position: "relative" }} >
       <AutoPlaySwipeableViews
         axis={theme.direction === "rtl" ? "x-reverse" : "x"}
         index={activeStep}
@@ -31,12 +29,12 @@ const CarouselSolo: React.FC<Img> = ({ images, height }) => {
         enableMouseEvents
       >
         {images.map((img, index) => (
-          <div key={index} style={{ height: height }}>
+          <div key={index} >
             {Math.abs(activeStep - index) <= 2 ? (
               <Box
                 component="img"
                 sx={{
-                  height: "100%",
+                  height: height,
                   width: "100%",
                 //   objectFit: "cover",
                 //   objectPosition: "center",

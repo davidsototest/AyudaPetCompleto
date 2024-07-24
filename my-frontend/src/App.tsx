@@ -7,7 +7,7 @@ import { ThemeProvider } from "@mui/material";
 import theme from "./theme/theme";
 import Header from "./layouts/Header";
 import Footer from "./layouts/Footer";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { useAuth } from "./context/AuthContext";
 import PrivateRoute from "./route/PrivateRoute";
 import AcountPage from "./pages/AcountPage";
 
@@ -20,7 +20,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Router>
-        <div style={{ marginBottom: "90px" }}>
+        <div style={{ marginBottom: "90px", width: "100%", display: "flex", justifyContent: "center" }}>
           <Header />
         </div>
         <Routes>

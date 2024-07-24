@@ -2,7 +2,7 @@ import React from "react";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import TitleParagraphy from "../components/others/TitleParagraphy";
 import CarouselImg from "../components/caruosel/CarouselImg";
-import { styled } from "@mui/material";
+import { styled, useMediaQuery, useTheme } from "@mui/material";
 
 interface Props {
   // Define props here
@@ -10,9 +10,15 @@ interface Props {
 
 const Banner: React.FC<Props> = (Props) => {
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const height = isMobile ? 280 : 400;
+  const columnSpacing = isMobile ? 0 : 2;
+
   const ShadowedGrid = styled(Grid)(({ theme }) => ({
     position: "relative",
-    height: "400px",
+    height: height,
     "&::before, &::after": {
       content: '""',
       position: "absolute",
@@ -35,7 +41,7 @@ const Banner: React.FC<Props> = (Props) => {
   return (
     <Grid 
       container 
-      columnSpacing={2} 
+      columnSpacing={columnSpacing} 
       sx={{
         paddingTop: {
           xs: 0,
@@ -47,7 +53,7 @@ const Banner: React.FC<Props> = (Props) => {
         <TitleParagraphy />
       </Grid>
       <ShadowedGrid xs={12} md={6}>
-        <CarouselImg />
+        <CarouselImg height={height}/>
       </ShadowedGrid>
     </Grid>
   );
